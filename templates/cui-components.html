@@ -1,0 +1,171 @@
+{#- ciderui's components as Tera components, each writing the markup its
+    crate's component writes (ciderui/rust/src/), with the same fields as
+    parameters; test/markup.mjs holds each to ciderui's examples. A field
+    the crate leaves out with "" is "" here; one it requires throws when
+    empty, as the crate panics. Markup a page gives (a logo, a picture, a
+    body) is HTML, written as it is. -#}
+
+{#- cui_more_link: `cui-link`'s more link, its text and the chevron
+    after it (the crate's MoreLink). -#}
+{% component cui_more_link(href, text, class="") -%}
+{%- if not href %}{{ throw(message="ciderui-zola: cui_more_link needs an href") }}{% endif -%}
+{%- if not text %}{{ throw(message="ciderui-zola: cui_more_link needs a text") }}{% endif -%}
+<a class="cui-link{% if class %} {{ class }}{% endif %}" data-variant="more" href="{{ href }}"><span class="cui-link-text">{{ text }}</span>{{ <cui_icon name="more" class="cui-link-icon" /> }}</a>
+{%- endcomponent cui_more_link %}
+
+{#- cui_section: a band of the page, its ground (variant="alt"), its
+    rhythm (size="lg"), dark, its content (the crate's Section). -#}
+{% component cui_section(variant="", size="", dark=false, class="") -%}
+{%- if variant not in ["", "alt"] %}{{ throw(message="ciderui-zola: a cui_section's variant is \"alt\" or left out, not " ~ variant) }}{% endif -%}
+{%- if size not in ["", "lg"] %}{{ throw(message="ciderui-zola: a cui_section's size is \"lg\" or left out, not " ~ size) }}{% endif -%}
+<section class="cui-section{% if dark %} cui-dark{% endif %}{% if class %} {{ class }}{% endif %}"{% if variant %} data-variant="{{ variant }}"{% endif %}{% if size %} data-size="{{ size }}"{% endif %}>
+<div class="cui-section-content">{{ body | safe }}</div>
+</section>
+{%- endcomponent cui_section %}
+
+{#- cui_globalnav: the bar across the top of the page, the site's logo
+    (HTML: an <svg> in currentColor), its links ([{ text, href }]), its
+    search and bag pages if it has them ("" if not), dark, clear over a
+    hero (the crate's GlobalNav). -#}
+{% component cui_globalnav(logo, home, name, links, search="", bag="", dark=false, clear=false, class="") -%}
+{%- if not home %}{{ throw(message="ciderui-zola: cui_globalnav needs a home") }}{% endif -%}
+{%- if not name %}{{ throw(message="ciderui-zola: cui_globalnav needs a name") }}{% endif -%}
+{%- if not links %}{{ throw(message="ciderui-zola: cui_globalnav needs links") }}{% endif -%}
+<nav class="cui-globalnav{% if dark %} cui-dark{% endif %}{% if class %} {{ class }}{% endif %}"{% if clear %} data-variant="clear"{% endif %} aria-label="Global">
+<div class="cui-globalnav-content">
+<ul class="cui-globalnav-list" id="cui-globalnav-menu" popover>
+<li><a class="cui-globalnav-logo" href="{{ home }}" aria-label="{{ name }}">{{ logo | safe }}</a></li>
+<li><button class="cui-globalnav-closebutton" popovertarget="cui-globalnav-menu" popovertargetaction="hide" aria-label="Close" autofocus>{{ <cui_icon name="menu" /> }}</button></li>
+{%- for link in links %}
+<li><a class="cui-globalnav-link" href="{{ link.href }}">{{ link.text }}</a></li>
+{%- endfor %}
+{%- if search %}
+<li><a class="cui-globalnav-icon" href="{{ search }}" aria-label="Search">{{ <cui_icon name="search" class="cui-globalnav-image" /> }}{{ <cui_icon name="search_compact" class="cui-globalnav-image-compact" /> }}</a></li>
+{%- endif %}
+{%- if bag %}
+<li><a class="cui-globalnav-icon" href="{{ bag }}" aria-label="Bag">{{ <cui_icon name="bag" class="cui-globalnav-image" /> }}{{ <cui_icon name="bag_compact" class="cui-globalnav-image-compact" /> }}</a></li>
+{%- endif %}
+</ul>
+<button class="cui-globalnav-menubutton" popovertarget="cui-globalnav-menu" aria-label="Menu">{{ <cui_icon name="menu" /> }}</button>
+</div>
+</nav>
+{%- endcomponent cui_globalnav %}
+
+{#- cui_footer: the footer, its notes (HTML, "" for none), its directory
+    ([[{ id, title, links: [{ text, href }] }]], columns of sections, []
+    for none), its shop line (HTML, "" for none), its copyright, its legal
+    links ([{ text, href }]), its locale ({ text, href }, {} for none) (the
+    crate's Footer and FooterSection). -#}
+{% component cui_footer(copyright, notes="", directory=[], shop="", links=[], locale={}, class="") -%}
+{%- if not copyright %}{{ throw(message="ciderui-zola: cui_footer needs a copyright") }}{% endif -%}
+<footer class="cui-footer{% if class %} {{ class }}{% endif %}">
+<div class="cui-footer-content">
+{%- if notes %}
+<section class="cui-footer-notes" aria-label="Footnotes">{{ notes | safe }}</section>
+{%- endif %}
+{%- if directory %}
+<nav class="cui-footer-directory" aria-label="Directory">
+{%- for column in directory %}
+<div class="cui-footer-column">
+{%- for section in column %}
+{%- if not section.id or not section.title %}{{ throw(message="ciderui-zola: a cui_footer section needs an id and a title") }}{% endif %}
+<div class="cui-footer-section">
+<input class="cui-footer-toggle" type="checkbox" id="{{ section.id }}">
+<h3 class="cui-footer-title"><label for="{{ section.id }}">{{ section.title }}{{ <cui_icon name="footer_chevron" /> }}</label></h3>
+<ul class="cui-footer-list">
+{%- for link in section.links %}
+<li><a href="{{ link.href }}">{{ link.text }}</a></li>
+{%- endfor %}
+</ul>
+</div>
+{%- endfor %}
+</div>
+{%- endfor %}
+</nav>
+{%- endif %}
+<div class="cui-footer-legal">
+{%- if shop %}
+<p class="cui-footer-shop">{{ shop | safe }}</p>
+{%- endif %}
+<div class="cui-footer-row">
+<p class="cui-footer-copyright">{{ copyright }}</p>
+{%- if links %}
+<ul class="cui-footer-links">
+{%- for link in links %}
+<li><a href="{{ link.href }}">{{ link.text }}</a></li>
+{%- endfor %}
+</ul>
+{%- endif %}
+{%- if locale %}
+<a class="cui-footer-locale" href="{{ locale.href }}">{{ locale.text }}</a>
+{%- endif %}
+</div>
+</div>
+</div>
+</footer>
+{%- endcomponent cui_footer %}
+
+{#- cui_article: a Newsroom story, its header (its category, its date,
+    the headline, a subhead) over its copy (the body: HTML, as markdown
+    renders it) (the crate's Article). -#}
+{% component cui_article(headline, category="", datetime="", date="", subhead="", class="") -%}
+{%- if not headline %}{{ throw(message="ciderui-zola: cui_article needs a headline") }}{% endif -%}
+{%- if date and not datetime %}{{ throw(message="ciderui-zola: a cui_article's date needs its datetime") }}{% endif -%}
+<article class="cui-article{% if class %} {{ class }}{% endif %}">
+<header class="cui-article-header">
+{%- if category or date %}
+<p class="cui-article-eyebrow">{% if category %}<span class="cui-article-category">{{ category }}</span>{% endif %}{% if date %}<time class="cui-article-date" datetime="{{ datetime }}">{{ date }}</time>{% endif %}</p>
+{%- endif %}
+<h1 class="cui-article-headline">{{ headline }}</h1>
+{%- if subhead %}
+<p class="cui-article-subhead">{{ subhead }}</p>
+{%- endif %}
+</header>
+<div class="cui-article-body">{{ body | safe }}</div>
+</article>
+{%- endcomponent cui_article %}
+
+{#- cui_stories: the Newsroom index's band, its heading over its grid of
+    stories (body: the <li>s, each a cui_story) (the crate's Stories). -#}
+{% component cui_stories(heading, class="") -%}
+{%- if not heading %}{{ throw(message="ciderui-zola: cui_stories needs a heading") }}{% endif -%}
+<section class="cui-stories{% if class %} {{ class }}{% endif %}">
+<div class="cui-stories-content">
+<h2 class="cui-stories-heading">{{ heading }}</h2>
+<ul class="cui-stories-list">{{ body | safe }}</ul>
+</div>
+</section>
+{%- endcomponent cui_stories %}
+
+{#- cui_story: a story, its picture (HTML: an <img class="cui-story-media">,
+    "" for none), its category, its date, its headline; size "md" (two
+    across), "lg" (one across) or "" (three across) (the crate's Story). -#}
+{% component cui_story(href, headline, size="", media="", category="", datetime="", date="") -%}
+{%- if not href %}{{ throw(message="ciderui-zola: cui_story needs an href") }}{% endif -%}
+{%- if not headline %}{{ throw(message="ciderui-zola: cui_story needs a headline") }}{% endif -%}
+{%- if date and not datetime %}{{ throw(message="ciderui-zola: a cui_story's date needs its datetime") }}{% endif -%}
+{%- if size not in ["", "md", "lg"] %}{{ throw(message="ciderui-zola: a cui_story's size is \"md\", \"lg\" or left out, not " ~ size) }}{% endif -%}
+<a class="cui-story"{% if size %} data-size="{{ size }}"{% endif %} href="{{ href }}">{{ media | safe }}<div class="cui-story-content"><div class="cui-story-head">{% if category %}<p class="cui-story-category">{{ category }}</p>{% endif %}<h3 class="cui-story-headline">{{ headline }}</h3></div>{% if date %}<time class="cui-story-date" datetime="{{ datetime }}">{{ date }}</time>{% endif %}</div></a>
+{%- endcomponent cui_story %}
+
+{#- cui_posts: the archive's month, or with size "sm" an article's related
+    stories: its heading over ruled rows (body: the <li>s, each a
+    cui_post) (the crate's Posts). -#}
+{% component cui_posts(heading, size="", class="") -%}
+{%- if not heading %}{{ throw(message="ciderui-zola: cui_posts needs a heading") }}{% endif -%}
+{%- if size not in ["", "sm"] %}{{ throw(message="ciderui-zola: a cui_posts' size is \"sm\" or left out, not " ~ size) }}{% endif -%}
+<section class="cui-posts{% if class %} {{ class }}{% endif %}"{% if size %} data-size="{{ size }}"{% endif %}>
+<h2 class="cui-posts-heading">{{ heading }}</h2>
+<ul class="cui-posts-list">{{ body | safe }}</ul>
+</section>
+{%- endcomponent cui_posts %}
+
+{#- cui_post: a row, its picture (HTML: an <img class="cui-post-media">,
+    "" for none), its category, its headline, its date (the crate's
+    Post). -#}
+{% component cui_post(href, headline, media="", category="", datetime="", date="") -%}
+{%- if not href %}{{ throw(message="ciderui-zola: cui_post needs an href") }}{% endif -%}
+{%- if not headline %}{{ throw(message="ciderui-zola: cui_post needs a headline") }}{% endif -%}
+{%- if date and not datetime %}{{ throw(message="ciderui-zola: a cui_post's date needs its datetime") }}{% endif -%}
+<a class="cui-post" href="{{ href }}">{{ media | safe }}<div class="cui-post-content">{% if category %}<p class="cui-post-category">{{ category }}</p>{% endif %}<h3 class="cui-post-headline">{{ headline }}</h3>{% if date %}<time class="cui-post-date" datetime="{{ datetime }}">{{ date }}</time>{% endif %}</div></a>
+{%- endcomponent cui_post %}

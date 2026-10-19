@@ -1,0 +1,32 @@
+name = "ciderui-zola"
+description = "apple.com's look for Zola sites, its pages and its news, built on ciderui"
+license = "MIT"
+homepage = ""
+min_version = "0.23.6"
+demo = ""
+
+[author]
+name = "newlix"
+homepage = ""
+
+# The theme's settings, each set in the site's [extra] (Zola lays a site's
+# [extra] over these key by key):
+# - logo: the global nav's logo, an SVG file in the site (static/logo.svg),
+#   drawn inline in currentColor, as ciderui's icons are. Required with a
+#   nav.
+# - nav: the global nav's links, [{ text, href }] (a path in the site, or a
+#   URL); [] for no global nav. search, bag: the global nav's search and
+#   bag pages ("" for none).
+# - footer: { copyright, links?, directory?, notes?, shop?, locale? }, the
+#   footer's (ciderui's cui-footer: links [{ text, href }]; directory
+#   columns of sections [[{ id, title, links }]]; notes and shop HTML;
+#   locale { text, href }); {} for no footer.
+# - head: tags for every page's <head>, after the theme's, [{ tag, attrs?,
+#   content? }].
+[extra]
+logo = ""
+nav = []
+search = ""
+bag = ""
+footer = {}
+head = []

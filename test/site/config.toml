@@ -1,0 +1,51 @@
+# The checks' site (test/markup.mjs, test/style.mjs): a page for each of
+# ciderui's examples, written through the theme's components. The checks
+# build a copy with the theme linked in as themes/ciderui-zola.
+base_url = "https://check.test"
+title = "ciderui-zola checks"
+theme = "ciderui-zola"
+compile_sass = false
+build_search_index = false
+
+[markdown]
+bottom_footnotes = true
+insert_anchor_links = "none"
+github_alerts = false
+
+[markdown.highlighting]
+style = "inline"
+light_theme = "github-light"
+dark_theme = "github-dark"
+
+# the global nav's and the footer's, as ciderui's examples have them
+# (globalnav/globalnav.html, footer/footer.html)
+[extra]
+logo = "static/logo.svg"
+nav = [
+  { text = "Store", href = "/store" },
+  { text = "Mac", href = "/mac" },
+  { text = "iPad", href = "/ipad" },
+  { text = "Support", href = "/support" },
+]
+search = "/search"
+bag = "/bag"
+
+[extra.footer]
+notes = '<p>Trade-in values vary. See <a href="/shop/trade-in/">apple.com/shop/trade-in</a> for details.</p>'
+directory = [
+  [
+    { id = "footer-shop", title = "Shop and Learn", links = [{ text = "Store", href = "/store/" }, { text = "Mac", href = "/mac/" }, { text = "iPhone", href = "/iphone/" }] },
+    { id = "footer-wallet", title = "Apple Wallet", links = [{ text = "Wallet", href = "/wallet/" }, { text = "Apple Card", href = "/apple-card/" }] },
+  ],
+  [
+    { id = "footer-account", title = "Account", links = [{ text = "Manage Your Account", href = "/account/" }, { text = "Store Account", href = "/shop/account/" }] },
+  ],
+]
+shop = 'More ways to shop: <a href="/retail/">Find a store</a> near you.'
+copyright = "Copyright © 2026 Example Inc. All rights reserved."
+links = [
+  { text = "Privacy Policy", href = "/privacy/" },
+  { text = "Terms of Use", href = "/terms/" },
+  { text = "Site Map", href = "/sitemap/" },
+]
+locale = { text = "United States", href = "/choose-country/" }

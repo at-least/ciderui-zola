@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node scripts/build.mjs --check"
+    "test": "node scripts/build.mjs --check && node test/markup.mjs"
   },
   "devDependencies": {
     "@tailwindcss/cli": "4.3.3",
