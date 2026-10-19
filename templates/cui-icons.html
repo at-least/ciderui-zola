@@ -1,7 +1,8 @@
 {#- cui_icon: one of ciderui's icons by its name in the crate, in small letters
     (more, search, search_compact, bag, bag_compact, searchfield,
     searchfield_compact, arrow, arrow_compact, menu, chevron, paddle_previous,
-    paddle_next, check, disclosure, footer_chevron, close), with
+    paddle_next, check, disclosure, footer_chevron, alert, dropdown, close),
+    with
     class on its <svg>. Written by scripts/build.mjs from ciderui's
     rust/src/icon.rs: not edited by hand. -#}
 {% component cui_icon(name, class="") -%}
@@ -37,6 +38,10 @@
 <svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="17" height="17" viewBox="0 0 17 8.85"><path d="M15 1.13 8.5 7.72 2 1.13" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
 {%- elif name == "footer_chevron" -%}
 <svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="11" height="6" viewBox="0 0 11 6"><path d="M10.075.675 5.5 5.323.925.675" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+{%- elif name == "alert" -%}
+<svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="1.171em" height="0.995em" viewBox="0 0 1171 995"><circle cx="585" cy="497.5" r="456.25" fill="none" stroke="currentColor" stroke-width="82.5"/><path d="M584 280V550" fill="none" stroke="currentColor" stroke-width="70" stroke-linecap="round"/><circle cx="585" cy="692.5" r="50" fill="currentColor"/></svg>
+{%- elif name == "dropdown" -%}
+<svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="25" height="25" viewBox="0 0 21 21"><path d="M6.075 9.275 10.5 13.7 14.925 9.275" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/></svg>
 {%- elif name == "close" -%}
 <svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="20" height="20" viewBox="0 0 20 20"><path d="M4.88 4.88 15.12 15.12M15.12 4.88 4.88 15.12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
 {%- else -%}
