@@ -53,6 +53,6 @@ A page's picture (its story's, its row's) comes from its front matter (`[extra] 
 
 ## Assumptions
 
-- Measured: Zola 0.23.6 is the newest release (2026-09-12) and has no shortcodes, its components Tera 2's, run before markdown, so a component writing a block writes its body between blank lines; `config.extra` merges the site's over the theme's key by key; Giallo's inline style on `<pre>`; the date filter, `page.year` and `page.month`, `group_by`; `bottom_footnotes`' markup (probes, 2026-10-19).
+- Measured: Zola 0.23.6 is the newest release (2026-09-12) and has no shortcodes, its components Tera 2's, run before markdown, so a component writing a block writes its body between blank lines; `config.extra` merges the site's over the theme's key by key; Giallo's inline style on `<pre>`; the date filter, `page.year` and `page.month`, `group_by`; `bottom_footnotes`' markup (probes, 2026-10-19); the script and the pages it serves outside Chromium, on ciderui's documentation: Safari 27.0.1 on macOS, Safari 26.5 on the iOS simulator, Chrome 155 (ciderui's `reference/docs/`, which found the script's animation frame starved in an iframe out of sight on iOS, fixed in 4bad1c7).
 - Stated by the owner: ciderui's documentation first, news in the Newsroom's look, one script for the paddles and dots, a local repository, English.
 - Guessed: that the owner's other sites will want the same pages; that Zola's markup for markdown holds across its 0.23 releases (the replacements match what it writes, and a test fails where they stop matching).
