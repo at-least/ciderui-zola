@@ -1,0 +1,18 @@
+{
+  "name": "ciderui-zola",
+  "version": "0.1.0",
+  "description": "Builds and checks the ciderui Zola theme; a site using the theme needs only zola",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/build.mjs --check"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "ciderui": "file:../ciderui",
+    "playwright-chromium": "1.62.1",
+    "tailwindcss": "4.3.3"
+  }
+}
