@@ -1,6 +1,6 @@
 # ciderui-zola: its design
 
-ciderui-zola is a [Zola](https://www.getzola.org) theme in apple.com's look, built on [ciderui](../ciderui): a site's pages, its news (apple.com's Newsroom), and the documentation of ciderui itself, which is its first site. A site needs only `zola` (0.23.6 or later): the theme ships its stylesheet, its fonts and its one script prebuilt. It is vpkit-zola's architecture (`../vpkit-zola`) with ciderui where vpkit-zola has vpkit, and without its docs layout. This documents what is decided, before the templates exist.
+ciderui-zola is a [Zola](https://www.getzola.org) theme in apple.com's look, built on [ciderui](../ciderui): a site's pages, its news (apple.com's Newsroom), and the documentation of ciderui itself, which is its first site. A site needs only `zola` (0.23.6 or later): the theme ships its stylesheet, its fonts and its one script prebuilt. It is vpkit-zola's architecture (`../vpkit-zola`) with ciderui where vpkit-zola has vpkit, and without its docs layout. This documents what is decided, and was written before the templates; it is kept to them.
 
 What is called measured here was run (Zola 0.23.6, Tera 2.4.0, Chromium 151 through Playwright, 2026-10-19); stated is the owner's; guessed is neither.
 
@@ -27,23 +27,26 @@ ciderui is the standard, and ciderui's is apple.com, measured. The theme proves 
 
 | template | what | from |
 | --- | --- | --- |
-| `base.html` | the head (the stylesheet, Inter's latin face preloaded, the script deferred, a site's own tags), `cui-globalnav` from `[extra] nav`, the page's content, `cui-footer` from `[extra] footer` | the crate's `GlobalNav`, `Footer` |
-| `index.html` | the home: its markdown, a page composed of components (`{{ <cui_section …> }}`) | `cui-section`, `cui-tile`, … |
-| `page.html` | an article: `cui-article`, its header from the front matter (title, description, date, `[extra] category`), its copy the markdown; in a section with news, the related stories under it (`cui-posts`, `data-size="sm"`) | the crate's `Article`, `Posts` |
-| `news.html` | a section's index: `cui-stories`, the newest first (one across, two two across, the rest three across, as the Newsroom's), a more link to the archive | `Stories`, `Story` |
-| `archive.html` | the section's archive: a `cui-posts` for each month, the newest first | `Posts`, `Post` |
-| `docs.html` | a docs section's index, and its pages' local nav (`cui-localnav`, the section's title and its pages) | `LocalNav` |
+| `base.html` | the head (the stylesheet, Inter's latin face preloaded, the script deferred, a site's own tags), `cui-globalnav` from `[extra] nav`, the page's content, `cui-footer` from `[extra] footer`; refuses `[markdown]` settings it cannot read | the crate's `GlobalNav`, `Footer` |
+| `index.html` | the home: its markdown, a page composed of ciderui's markup | `cui-section`, `cui-tile`, … |
+| `page.html` | a page: `cui-article`, its headline the title, its subhead the description, its copy the markdown; under its section's local nav, if the section has one (`[extra.localnav]`) | the crate's `Article`, `LocalNav` |
+| `section.html` | a section: an article of its own markdown, then its pages as rows (`cui-posts`, each with its `[extra] category`, its date and its picture, any of them left out when the page has none); under its local nav | `Article`, `Posts`, `Post` |
+| `news.html` | a news section's index: `cui-stories`, the newest first (one across, two two across, the rest three across, as the Newsroom's); its archive reached by its local nav, as the Newsroom's is | `Stories`, `Story` |
+| `news-page.html` | a story: an article with its eyebrow (its category, its date), then its section's newest three others (`cui-posts`, `data-size="sm"`) | `Article`, `Posts` |
+| `archive.html` | the news section's archive: a `cui-posts` for each month, the newest first | `Posts`, `Post` |
 | `404.html` | Zola's 404: a headline and a more link home, in a `cui-section` | ciderui's (apple.com's 404 is its old www page, `#333333` text and a search field: not measured as a standard) |
 
-A page's picture (a story's, a row's, a figure's) comes from its front matter (`[extra] image`), resized by Zola (`resize_image`) to the sizes the components draw it at.
+A site adds its own templates beside these (ciderui's documentation: its home, its examples' frames).
+
+A page's picture (its story's, its row's) comes from its front matter (`[extra] image`), resized by Zola (`resize_image`) to the sizes the components draw it at.
 
 ## How it is proven
 
 `npm test`, each refusing to run on a stale build:
 
 - `build --check`: `static/` is what `npm run build` writes from the ciderui checkout.
-- `test/markup.mjs`: a site (`test/site/`) whose pages render every component through the theme; each component's markup in the built page equals ciderui's example, normalized as the crate's tests are.
-- `test/style.mjs`: the same pages in Chromium (`--font-render-hinting=none`) at ciderui's widths and both sides of 735 and 1069, every element of each component compared, computed style by computed style and box by box, with ciderui's example rendered with ciderui's own compiled CSS beside it, within 1/32px. A difference the theme means (a page's own skeleton around a component) is a golden check with its reason, as ciderui's rule 13 has it; an entry no check reads fails the run.
+- `test/markup.mjs`: a site (`test/site/`) with a page writing, through the theme's components, each of ciderui's examples the templates write (nine: the more link, a section, the global nav, the footer, the local nav, the article, the stories, the archive's and the related posts); each one's markup in the built page equals ciderui's example, normalized as the crate's tests are.
+- `test/style.mjs`: the same pages in Chromium (`--font-render-hinting=none`) at ciderui's widths and both sides of 735 and 1069, every element of each component compared, computed style by computed style and box by box, with ciderui's example rendered with ciderui's own compiled CSS beside it, within 1/32px. The theme means no difference, so there is no golden entry; one it came to mean would be a golden check with its reason, as ciderui's rule 13 has it. Not held by a check: `css/zola.css`, the page's skeleton (the room under a page's last article or rows, the Newsroom's, ciderui's `newsroom-article:footertile`), looked at in Chromium only.
 - `test/behavior.mjs`: the script, step by step: a paddle scrolls its row, the one at an end is disabled, the dot of the item in view is current.
 - `test/site.mjs`: the theme's own site and `ciderui/docs/` build, every page with its head complete, no Tera or markdown showing as text.
 
