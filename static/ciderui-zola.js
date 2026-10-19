@@ -48,14 +48,12 @@
         }
       }
     };
-    let queued = false;
-    const queue = () => {
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(() => { queued = false; update(); });
-    };
-    row.addEventListener('scroll', queue, { passive: true });
-    addEventListener('resize', queue);
+    // set in the event itself: a browser sends a scroll event and a resize
+    // event once a frame at most, and a frame out of the window may run no
+    // animation frame (Safari 26.5 on iOS ran none for a page's iframe out of
+    // sight while its row scrolled, ciderui's reference/docs/)
+    row.addEventListener('scroll', update, { passive: true });
+    addEventListener('resize', update);
     if (previous) {
       previous.addEventListener('click', () => row.scrollBy({ left: -row.clientWidth, behavior: smooth() }));
       next.addEventListener('click', () => row.scrollBy({ left: row.clientWidth, behavior: smooth() }));
