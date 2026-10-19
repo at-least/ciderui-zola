@@ -23,6 +23,7 @@ homepage = ""
 #   locale { text, href }); {} for no footer.
 # - head: tags for every page's <head>, after the theme's, [{ tag, attrs?,
 #   content? }].
+# - not_found: the 404 page's texts, { headline?, link? }.
 [extra]
 logo = ""
 nav = []
@@ -30,3 +31,4 @@ search = ""
 bag = ""
 footer = {}
 head = []
+not_found = {}

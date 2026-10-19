@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{#- A page: an article (cui-article), its headline the page's title, its
+    subhead its description, its copy the markdown; under its section's
+    local nav, if the section has one. -#}
+{% block title %}{{ page.title }}{% if page.title != config.title %} - {{ config.title }}{% endif %}{% endblock title %}
+{% block description %}{{ page.description or config.description or "" }}{% endblock description %}
+{% block content -%}
+{%- set parent = get_section(path=page.ancestors | last) if page.ancestors else "" -%}
+{{ <cui_section_localnav section={parent} current={page.permalink} /> }}
+{% <cui_article headline={page.title} subhead={page.description or ""}> %}{{ <cui_markdown html={page.content} /> }}{% </cui_article> %}
+{%- endblock content %}

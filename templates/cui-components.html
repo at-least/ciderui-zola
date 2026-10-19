@@ -169,3 +169,82 @@
 {%- if date and not datetime %}{{ throw(message="ciderui-zola: a cui_post's date needs its datetime") }}{% endif -%}
 <a class="cui-post" href="{{ href }}">{{ media | safe }}<div class="cui-post-content">{% if category %}<p class="cui-post-category">{{ category }}</p>{% endif %}<h3 class="cui-post-headline">{{ headline }}</h3>{% if date %}<time class="cui-post-date" datetime="{{ datetime }}">{{ date }}</time>{% endif %}</div></a>
 {%- endcomponent cui_post %}
+
+{#- cui_localnav: the bar under the global nav, a section's title and its
+    pages ([{ text, href }]; none, no menu), the current page's href marked,
+    a button after them ({ text, href }, {} for none), dark (the crate's
+    LocalNav). -#}
+{% component cui_localnav(title, href, links=[], current="", button={}, dark=false, class="") -%}
+{%- if not title %}{{ throw(message="ciderui-zola: cui_localnav needs a title") }}{% endif -%}
+{%- if not href %}{{ throw(message="ciderui-zola: cui_localnav needs an href") }}{% endif -%}
+<nav class="cui-localnav{% if dark %} cui-dark{% endif %}{% if class %} {{ class }}{% endif %}" aria-label="Local">
+<div class="cui-localnav-content">
+<a class="cui-localnav-title" href="{{ href }}">{{ title }}</a>
+{%- if links %}
+<input class="cui-localnav-toggle" type="checkbox" id="cui-localnav-menu" aria-label="Menu">
+<div class="cui-localnav-menu">
+<ul class="cui-localnav-list">
+{%- for link in links %}
+<li><a class="cui-localnav-link" href="{{ link.href }}"{% if link.href == current %} aria-current="page"{% endif %}>{{ link.text }}</a></li>
+{%- endfor %}
+</ul>
+</div>
+{%- endif %}
+<div class="cui-localnav-actions">
+{%- if links %}
+<label class="cui-localnav-menubutton" for="cui-localnav-menu" aria-hidden="true">{{ <cui_icon name="chevron" /> }}</label>
+{%- endif %}
+{%- if button %}
+<a class="cui-btn" data-size="sm" href="{{ button.href }}">{{ button.text }}</a>
+{%- endif %}
+</div>
+</div>
+</nav>
+{%- endcomponent cui_localnav %}
+
+{#- cui_head: a site's own tags for every page's <head>, after the theme's
+    ([{ tag, attrs?, content? }], content the element's inner HTML); an
+    href or src that is a path in the site goes through get_url. base,
+    link and meta are void. -#}
+{% component cui_head(tags) -%}
+{%- for t in tags -%}
+<{{ t.tag }}
+{%- if t.attrs is defined %}{% for name, value in t.attrs %} {{ name }}="{{ get_url(path=value) if name in ["href", "src"] and value is matching(pat="^/(?:[^/]|$)") else value }}"{% endfor %}{% endif -%}
+>
+{%- if t.tag not in ["base", "link", "meta"] %}{% if t.content is defined %}{{ t.content | safe }}{% endif %}</{{ t.tag }}>{% endif %}
+{%- endfor -%}
+{%- endcomponent cui_head %}
+
+{#- cui_section_localnav: a section's local nav, if its front matter has
+    one ([extra.localnav] links = [{ text, href }], button = { text, href
+    }, a path in the site going through get_url): its title the section's,
+    linking it, current the page's permalink; nothing for "" or a section
+    without one. -#}
+{% component cui_section_localnav(section, current) -%}
+{%- if section and section.extra.localnav is defined -%}
+{%- set nav = section.extra.localnav -%}
+{%- set links -%}[{% for l in nav.links | default(value=[]) %}{"text": {{ l.text | json_encode | safe }}, "href": {{ (get_url(path=l.href, trailing_slash=true) if l.href is matching(pat="^/") else l.href) | json_encode | safe }}}{% if not loop.last %},{% endif %}{% endfor %}]{%- endset -%}
+{%- set button = nav.button | default(value={}) -%}
+{{ <cui_localnav title={section.title} href={section.permalink} links={load_data(literal=links, format="json")} current={current} button={ {"text": button.text, "href": get_url(path=button.href, trailing_slash=true) if button.href is matching(pat="^/") else button.href} if button else {} } /> }}
+{%- endif -%}
+{%- endcomponent cui_section_localnav %}
+
+{#- cui_page_media: a page's picture for a story or a row, from its front
+    matter ([extra] image, a path Zola resizes: in static/ or content/),
+    filled to 16:9 at width by width × 9/16, with class; "" with none. -#}
+{% component cui_page_media(page, class, width) -%}
+{%- if page.extra.image is defined -%}
+{%- set height = (width * 9 / 16) | round | int -%}
+{%- set image = resize_image(path=page.extra.image, width=width, height=height, op="fill") -%}
+<img class="{{ class }}" src="{{ image.url }}" alt="" width="{{ image.width }}" height="{{ image.height }}">
+{%- endif -%}
+{%- endcomponent cui_page_media %}
+
+{#- cz_links: links ([{ text, href }]) as JSON for load_data, each href a
+    path in the site (/privacy/) through get_url, so it holds under
+    base_url wherever the site is served, its trailing slash kept; a URL as
+    it is. For base.html's nav and footer, whose components write their
+    hrefs as given. -#}
+{% component cz_links(links) -%}
+[{%- for l in links -%}{"text": {{ l.text | json_encode | safe }}, "href": {{ (get_url(path=l.href, trailing_slash=l.href is matching(pat="/$")) if l.href is matching(pat="^/(?:[^/]|$)") else l.href) | json_encode | safe }}}{% if not loop.last %},{% endif %}{%- endfor -%}]
+{%- endcomponent cz_links %}

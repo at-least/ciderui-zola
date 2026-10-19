@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{#- A section: an article of its title, description and markdown, then its
+    pages as rows (cui-posts, headed by its [extra] heading, "Pages"),
+    under its local nav, if it has one. -#}
+{% block title %}{{ section.title }} - {{ config.title }}{% endblock title %}
+{% block description %}{{ section.description or config.description or "" }}{% endblock description %}
+{% block content -%}
+{{ <cui_section_localnav section={section} current={section.permalink} /> }}
+{% <cui_article headline={section.title} subhead={section.description or ""}> %}{{ <cui_markdown html={section.content} /> }}{% </cui_article> %}
+{%- if section.pages %}
+{% <cui_posts heading={section.extra.heading | default(value="Pages")}> %}
+{%- for p in section.pages -%}
+{%- set media -%}{{ <cui_page_media page={p} class="cui-post-media" width={640} /> }}{%- endset -%}
+<li>{{ <cui_post href={p.permalink} media={media} category={p.extra.category | default(value="")} datetime={p.date | default(value="")} date={p.date | date(format="%B %-d, %Y") if p.date else ""} headline={p.title} /> }}</li>
+{%- endfor -%}
+{% </cui_posts> %}
+{%- endif %}
+{%- endblock content %}

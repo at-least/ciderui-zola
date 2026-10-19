@@ -1,0 +1,20 @@
+{#- cui_markdown: the HTML Zola renders from markdown, as cui-article reads
+    it. Each step matches only what Zola itself writes (a code block's text
+    is escaped, so it cannot match):
+    - a footnote's mark loses its brackets ([1] to 1), cui-article's mark
+      being the number on the line;
+    - the footnotes' section is cui-article-footnotes;
+    - a code block's <pre> loses Giallo's style: its color-scheme (light
+      dark, which would follow the reader's OS where ciderui's blocks set
+      theirs) and its own color and ground (cui-article's), its tokens
+      keeping their light-dark() colors.
+    Tera's strings take no backslash, and Rust's regex reads [[] as a
+    class inside a class: a bracket is matched as what is not a digit
+    around Zola's number. -#}
+{% component cui_markdown(html) -%}
+{{ html
+  | regex_replace(pattern=`(<sup class="footnote-reference"[^>]*><a [^>]*>)[^0-9<]([0-9]+)[^0-9<](</a></sup>)`, rep=`${1}${2}${3}`)
+  | replace(from=`<section class="footnotes">`, to=`<section class="cui-article-footnotes">`)
+  | regex_replace(pattern=`<pre class="giallo" style="[^"]*" *>`, rep=`<pre class="giallo">`)
+  | safe }}
+{%- endcomponent cui_markdown %}

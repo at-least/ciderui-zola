@@ -40,6 +40,7 @@ export const CASES = [
   ['section/section', `{% <cui_section> %}<p>Content</p>{% </cui_section> %}`],
   ['globalnav/globalnav', `{%- set f = config.extra -%}{{ <cui_globalnav logo={load_data(path=f.logo, format="plain") | trim} home="/" name="Cider" links={f.nav} search={f.search} bag={f.bag} /> }}`],
   ['footer/footer', `{%- set f = config.extra.footer -%}{{ <cui_footer notes={f.notes} directory={f.directory} shop={f.shop} copyright={f.copyright} links={f.links} locale={f.locale} /> }}`],
+  ['localnav/localnav', `{{ <cui_localnav title="MacBook Air" href="/macbook-air/" links={[{"text": "Overview", "href": "/macbook-air/"}, {"text": "Tech Specs", "href": "/macbook-air/specs/"}, {"text": "Compare", "href": "/macbook-air/compare/"}, {"text": "Switch from PC to Mac", "href": "/macbook-air/switch/"}]} current="/macbook-air/" button={ {"text": "Buy", "href": "/buy/macbook-air/"} } /> }}`],
   ['article/article', `{% <cui_article category="Update" datetime="2026-10-19" date="October 19, 2026" headline="ciderui comes to Zola" subhead=${str("The kit's look, now for a static site's pages and its news.")}> %}${articleBody}{% </cui_article> %}`],
   ['stories/stories', `{% <cui_stories heading="Latest News"> %}${[
     story('lg', '/news/zola/', 'Update', '2026-10-19', 'October 19, 2026', 'ciderui comes to Zola'),
@@ -63,7 +64,10 @@ export const CASES = [
 const parity = CASES.map(([id, tera]) => `<div data-example="${id}">${tera}</div>`).join('\n');
 
 if (process.argv[1] === new URL(import.meta.url).pathname) {
-  const { root, out } = zolaBuild('site', { 'templates/parity.html': `<!doctype html>\n<html lang="en"><body>\n${parity}\n</body></html>\n` });
+  const { root, out } = zolaBuild('site', {
+    'content/parity/_index.md': '+++\ntitle = "Parity"\ntemplate = "parity.html"\n+++\n',
+    'templates/parity.html': `<!doctype html>\n<html lang="en"><body>\n${parity}\n</body></html>\n`,
+  });
   const built = readFileSync(join(out, 'parity/index.html'), 'utf8');
   rmSync(root, { recursive: true, force: true });
   const browser = await chromium.launch();

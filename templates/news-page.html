@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{#- A news story: an article (cui-article) with its eyebrow (its [extra]
+    category, its date), then its section's other stories, the newest three
+    (cui-posts, data-size="sm"), headed by the section's [extra] related
+    ("More from" and its title). -#}
+{% block title %}{{ page.title }} - {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description or config.description or "" }}{% endblock description %}
+{% block content -%}
+{%- set parent = get_section(path=page.ancestors | last) -%}
+{{ <cui_section_localnav section={parent} current={page.permalink} /> }}
+{% <cui_article headline={page.title} subhead={page.description or ""} category={page.extra.category | default(value="")} datetime={page.date | default(value="")} date={page.date | date(format="%B %-d, %Y") if page.date else ""}> %}{{ <cui_markdown html={page.content} /> }}{% </cui_article> %}
+{#- the newest three but this one: of the first four, this one left out
+    if it is among the first three, else the fourth -#}
+{%- set mine -%}{% for p in parent.pages[:3] %}{% if p.permalink == page.permalink %}1{% endif %}{% endfor %}{%- endset -%}
+{%- if parent.pages | length > 1 %}
+{% <cui_posts size="sm" heading={parent.extra.related | default(value="More from " ~ parent.title)}> %}
+{%- for p in parent.pages[:4] -%}
+{%- if p.permalink != page.permalink and (mine or loop.index <= 3) -%}
+{%- set media -%}{{ <cui_page_media page={p} class="cui-post-media" width={640} /> }}{%- endset -%}
+<li>{{ <cui_post href={p.permalink} media={media} category={p.extra.category | default(value="")} datetime={p.date | default(value="")} date={p.date | date(format="%B %-d, %Y") if p.date else ""} headline={p.title} /> }}</li>
+{%- endif -%}
+{%- endfor -%}
+{% </cui_posts> %}
+{%- endif %}
+{%- endblock content %}
