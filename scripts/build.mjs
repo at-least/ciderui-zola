@@ -82,7 +82,6 @@ if (process.argv[2] === '--check') {
   }
 } else {
   rmSync(join(ROOT, 'static/fonts'), { recursive: true, force: true });
-  // the icons first: the stylesheet's build scans the templates
   writeFileSync(join(ROOT, ICON_FILE), icons());
   build(join(ROOT, 'static'));
 }
