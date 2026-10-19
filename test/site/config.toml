@@ -3,6 +3,7 @@
 # build a copy with the theme linked in as themes/ciderui-zola.
 base_url = "https://check.test"
 title = "ciderui-zola checks"
+description = "The pages ciderui-zola's checks build."
 theme = "ciderui-zola"
 compile_sass = false
 build_search_index = false

@@ -63,11 +63,14 @@ export const CASES = [
 
 const parity = CASES.map(([id, tera]) => `<div data-example="${id}">${tera}</div>`).join('\n');
 
+// the files that put the examples on the checks' site, at /parity/
+export const parityFiles = () => ({
+  'content/parity/_index.md': '+++\ntitle = "Parity"\ntemplate = "parity.html"\n+++\n',
+  'templates/parity.html': `<!doctype html>\n<html lang="en"><body>\n${parity}\n</body></html>\n`,
+});
+
 if (process.argv[1] === new URL(import.meta.url).pathname) {
-  const { root, out } = zolaBuild('site', {
-    'content/parity/_index.md': '+++\ntitle = "Parity"\ntemplate = "parity.html"\n+++\n',
-    'templates/parity.html': `<!doctype html>\n<html lang="en"><body>\n${parity}\n</body></html>\n`,
-  });
+  const { root, out } = zolaBuild('site', parityFiles());
   const built = readFileSync(join(out, 'parity/index.html'), 'utf8');
   rmSync(root, { recursive: true, force: true });
   const browser = await chromium.launch();
