@@ -11,7 +11,7 @@
 {% <cui_posts heading={of_month[0].date | date(format="%B %Y")}> %}
 {%- for p in of_month -%}
 {%- set media -%}{{ <cui_page_media page={p} class="cui-post-media" width={640} /> }}{%- endset -%}
-<li>{{ <cui_post href={p.permalink} media={media} category={p.extra.category | default(value="")} datetime={p.date | default(value="")} date={p.date | date(format="%B %-d, %Y") if p.date else ""} headline={p.title} /> }}</li>
+<li>{{ <cui_post href={p.permalink} media={media} category={p.extra.category | default(value="")} datetime={p.date or ""} date={p.date | date(format="%B %-d, %Y") if p.date else ""} headline={p.title} /> }}</li>
 {%- endfor -%}
 {% </cui_posts> %}
 {%- endfor -%}

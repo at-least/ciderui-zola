@@ -14,7 +14,7 @@
 {% <cui_stories heading={section.extra.heading | default(value="Latest News")}> %}
 {%- for p in section.pages[:count] -%}
 {%- set media -%}{{ <cui_page_media page={p} class="cui-story-media" width={1280} /> }}{%- endset -%}
-<li>{{ <cui_story size={"lg" if loop.first else ("md" if loop.index <= 3 else "")} href={p.permalink} media={media} category={p.extra.category | default(value="")} datetime={p.date | default(value="")} date={p.date | date(format="%B %-d, %Y") if p.date else ""} headline={p.title} /> }}</li>
+<li>{{ <cui_story size={"lg" if loop.first else ("md" if loop.index <= 3 else "")} href={p.permalink} media={media} category={p.extra.category | default(value="")} datetime={p.date or ""} date={p.date | date(format="%B %-d, %Y") if p.date else ""} headline={p.title} /> }}</li>
 {%- endfor -%}
 {% </cui_stories> %}
 {%- endblock content %}
