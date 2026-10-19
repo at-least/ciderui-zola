@@ -19,8 +19,8 @@ const str = (s) => {
   if (s.includes('`')) throw new Error(`a backtick in ${s.slice(0, 40)}`);
   return '`' + s + '`';
 };
-const GIF = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
-const img = (cls) => `<img class="${cls}" src="${GIF}" alt="" width="1280" height="720">`;
+const PICTURE = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgwIiBoZWlnaHQ9IjcyMCIvPg==';
+const img = (cls) => `<img class="${cls}" src="${PICTURE}" alt="" width="1280" height="720">`;
 
 // the article's copy, as its example gives it
 const articleBody = (() => {
