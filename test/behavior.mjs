@@ -10,8 +10,13 @@
 // nav's search sends q to the search page (search.html), which lists the
 // pages holding each of its words from Zola's index, those with them in
 // their title first, says when there are none, and is not one itself; its
-// own field sends q again. Fails at the first step that does not end as it
-// says.
+// own field sends q again. And its suggestions, two more pages here (A Plum
+// Cake before Plum in the index): two characters typed, the pages whose
+// title holds them, those starting with them first, and the words they
+// start, as ciderui's rows (its globalnav/suggestions.html), what was typed
+// marked, a status line saying so; one, or the field cleared, the quick
+// links again; none found, no sections; the index fetched once. Fails at
+// the first step that does not end as it says.
 
 import { existsSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { extname, join } from 'node:path';
@@ -27,6 +32,8 @@ const { root, out } = zolaBuild('site', {
   'config.toml': config.replace('search = "/search"\n', 'search = "/search/"\nsearch_flyout = true\nsearch_links = [{ text = "About", href = "/about/" }]\n'),
   'content/apricot.md': '+++\ntitle = "Apricot"\n+++\nA word on quince.\n',
   'content/quince.md': '+++\ntitle = "Quince"\n+++\nIts copy.\n',
+  'content/plum.md': '+++\ntitle = "Plum"\n+++\nIts copy.\n',
+  'content/a-plum-cake.md': '+++\ntitle = "A Plum Cake"\n+++\nIts copy.\n',
 });
 
 const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.woff2': 'font/woff2', '.png': 'image/png', '.json': 'application/json' };
@@ -133,6 +140,74 @@ await page.waitForTimeout(300);
 r = await results();
 check('its own field sends q to it again', JSON.stringify(r.rows) === JSON.stringify([['/apricot/', 'Apricot']]), r);
 check('no error on the search pages', errors.length === 0, errors);
+
+// the suggestions
+const order = JSON.parse(readFileSync(join(out, 'search_index.en.json'), 'utf8')).map((p) => new URL(p.url).pathname);
+if (!(order.indexOf('/a-plum-cake/') < order.indexOf('/plum/'))) throw new Error(`the index has Plum before A Plum Cake: ${order}`);
+const ciderui = readFileSync(join(CIDERUI, 'components/globalnav/examples/suggestions.html'), 'utf8').split('\n').map((l) => l.trim());
+const exampleRows = ['href="/mac"', 'href="/search?q=mac"'].map((href) => ciderui.find((l) => l.includes(`class="cui-globalnav-searchlink" ${href}`)));
+let fetched = 0;
+page.on('request', (req) => { if (req.url().includes('search_index')) fetched++; });
+const suggestions = () => page.evaluate((exampleRows) => {
+  const panel = document.querySelector('.cui-globalnav-searchpanel');
+  // a row as its markup, its link and text left out
+  const shape = (li) => li.outerHTML.replace(/href="[^"]*"/, 'href=""').replace(/<span>.*<\/span>/, '<span></span>');
+  const parsed = exampleRows.map((html) => { const t = document.createElement('template'); t.innerHTML = html; return shape(t.content.firstElementChild); });
+  const lists = [...panel.querySelectorAll(':scope > .cui-globalnav-searchlinks')];
+  return {
+    headings: [...panel.querySelectorAll(':scope > .cui-globalnav-searchheading')].map((h) => h.textContent),
+    named: lists.every((l) => document.getElementById(l.getAttribute('aria-labelledby'))?.matches('.cui-globalnav-searchheading')),
+    sections: lists.map((l) => [...l.children].map((li) => {
+      const a = li.querySelector('a');
+      return [new URL(a.href).pathname + new URL(a.href).search, a.querySelector('mark')?.textContent ?? null, a.textContent];
+    })),
+    shapes: lists.map((l) => shape(l.firstElementChild) === parsed[l.querySelector('svg circle') ? 1 : 0]),
+    status: document.querySelector('.cz-status')?.textContent ?? null,
+    color: lists[0]?.querySelector('mark') ? [getComputedStyle(lists[0].querySelector('a')).color, getComputedStyle(lists[0].querySelector('mark')).color] : null,
+    value: document.querySelector('.cui-globalnav-searchinput').value,
+  };
+}, exampleRows);
+const typed = async (keys, said) => {
+  await page.keyboard.type(keys);
+  // said: the status line to wait for (null: any)
+  if (said !== undefined) await page.waitForFunction((said) => { const t = document.querySelector('.cz-status').textContent; return said === null ? t !== '' : t === said; }, said);
+  await page.waitForTimeout(100);
+  return suggestions();
+};
+await page.goto('https://check.test/about/', { waitUntil: 'load' });
+await page.click('.cui-globalnav-icon[popovertarget="cui-globalnav-search"]');
+await page.waitForTimeout(400);
+r = await typed('p');
+check('one character typed: the quick links', JSON.stringify(r.headings) === '["Quick Links"]' && JSON.stringify(r.sections) === '[[["/about/",null,"About"]]]' && r.status === '' && fetched === 0, { ...r, fetched });
+r = await typed('l', '2 Suggested Links and 1 Suggested Searches available');
+check('two: the pages whose title holds them, those starting with them first, and the words they start, what was typed marked; a status line saying so',
+  JSON.stringify(r.headings) === '["Suggested Links","Suggested Searches"]'
+  && JSON.stringify(r.sections) === JSON.stringify([[['/plum/', 'Pl', 'Plum'], ['/a-plum-cake/', 'Pl', 'A Plum Cake']], [['/search/?q=plum', 'pl', 'plum']]]), r);
+check('its rows ciderui\'s (globalnav/suggestions.html: a link\'s arrow, a search\'s magnifier), each list named by its heading', r.shapes.length === 2 && r.shapes.every(Boolean) && r.named, r);
+check('muted, what was typed in the rows\' color (ciderui\'s, while a row marks it)', JSON.stringify(r.color) === '["rgb(110, 110, 115)","rgb(51, 51, 54)"]', r);
+await page.keyboard.press('Backspace');
+await page.waitForTimeout(100);
+r = await suggestions();
+check('back to one: the quick links again', JSON.stringify(r.headings) === '["Quick Links"]' && r.status === '', r);
+r = await typed('lx', 'No suggestions');
+check('none found: no sections, the status line saying so', r.headings.length === 0, r);
+await page.fill('.cui-globalnav-searchinput', '');
+r = await typed('a plum c', '1 Suggested Links and 3 Suggested Searches available');
+check('more than one word: the titles holding them all, and the words the last starts after the others', JSON.stringify(r.sections[0]) === JSON.stringify([['/a-plum-cake/', 'A Plum C', 'A Plum Cake']]) && r.sections[1].some((s) => JSON.stringify(s) === JSON.stringify(['/search/?q=a+plum+cake', 'a plum c', 'a plum cake'])), r);
+await page.fill('.cui-globalnav-searchinput', '');
+r = await typed('se', null);
+check('the search page is not a suggested link', r.sections.length > 0 && !r.sections.flat().some(([href]) => href === '/search/'), r);
+await page.click('.cui-globalnav-searchreset');
+await page.waitForTimeout(100);
+r = await suggestions();
+check('its clear button: the field empty, the quick links again', r.value === '' && JSON.stringify(r.headings) === '["Quick Links"]' && r.status === '', r);
+check('the index fetched once', fetched === 1, fetched);
+await page.focus('.cui-globalnav-searchinput');
+await typed('plu', null);
+await page.click('.cui-globalnav-searchlinks a[href$="/plum/"]');
+await page.waitForURL('**/plum/');
+check('a suggested link leads to its page', new URL(page.url()).pathname === '/plum/', page.url());
+check('no error with the suggestions', errors.length === 0, errors);
 await browser.close();
 rmSync(root, { recursive: true, force: true });
 console.log(`behavior: ${failures} failures`);

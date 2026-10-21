@@ -17,8 +17,11 @@ homepage = ""
 # - nav: the global nav's links, [{ text, href }] (a path in the site, or a
 #   URL); [] for no global nav. search, bag: the global nav's search and
 #   bag pages ("" for none). search_flyout: the nav's search a button
-#   opening the search over the page, which sends q to the search page
+#   opening the search over the page, which sends q to the search page and
+#   suggests pages and searches from the site's search index as one types
 #   (false: a link to it); search_links, its quick links, [{ text, href }].
+#   The flyout needs build_search_index = true and [search] index_format =
+#   "fuse_json".
 #   A search page of the site's own: a page with template = "search.html",
 #   which needs build_search_index = true and [search] index_format =
 #   "fuse_json".

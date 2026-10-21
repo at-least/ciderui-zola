@@ -6,7 +6,8 @@
 // (cui-gallery-dot, a link to an item) scroll the row to their item, and the
 // dot of the item the row shows is aria-current. Without it the rows still
 // scroll and snap, and a dot is a link. And the search page's results
-// (search.html), which need a script to be found.
+// (search.html), which need a script to be found, and the global nav's
+// search's suggestions.
 
 (() => {
   const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
@@ -111,4 +112,107 @@
       if (!hits.length) list.remove();
       template.after(results);
     });
+})();
+
+// the global nav's search's suggestions (its flyout, search_flyout, and
+// base.html's template cz-suggestions, ciderui's sections): once two
+// characters are typed, in the quick links' place, the pages whose title
+// holds what was typed (Suggested Links, those starting with it first) and
+// the words of the pages' titles and descriptions its last word starts
+// (Suggested Searches, each sent to the search page as q, the words the most
+// pages use first), four of each, what was typed marked; with fewer, or the
+// field cleared, the quick links again. Zola's index (fuse_json, the
+// template's data-index) is fetched once, when first needed, the search
+// page left out; a status line, read aloud and not shown (cz-status), says
+// what the suggestions hold, as apple.com's. Without the script, the quick
+// links.
+(() => {
+  const template = document.querySelector('template.cz-suggestions');
+  if (!template) return;
+  const panel = document.querySelector('.cui-globalnav-searchpanel');
+  const form = panel.querySelector('.cui-globalnav-searchfield');
+  const input = form.elements.q;
+  const close = panel.querySelector(':scope > .cui-globalnav-closebutton');
+  // the quick links: what is between the field and the sheet's X
+  const quick = [];
+  for (let n = form.nextElementSibling; n !== close; n = n.nextElementSibling) quick.push(n);
+  const status = document.createElement('p');
+  status.className = 'cz-status';
+  status.setAttribute('role', 'status');
+  form.after(status);
+  let shown = quick;
+  const show = (nodes, said) => {
+    for (const n of shown) n.remove();
+    close.before(...nodes);
+    shown = nodes;
+    status.textContent = said;
+  };
+  const sections = [...template.content.querySelectorAll('.cui-globalnav-searchlinks')].map((list) => ({ heading: list.previousElementSibling, list, row: list.firstElementChild }));
+  const here = new URL(form.action, location.href).pathname;
+  let index;
+  const load = () => (index ??= fetch(template.dataset.index)
+    .then((res) => {
+      if (!res.ok) throw new Error(`ciderui-zola: the search index ${template.dataset.index}: ${res.status}`);
+      return res.json();
+    })
+    .then((all) => {
+      const pages = all.filter((p) => p.title && new URL(p.url).pathname !== here);
+      const used = new Map();
+      for (const p of pages) {
+        for (const w of new Set(`${p.title} ${p.description ?? ''}`.toLowerCase().match(/[\p{L}\p{N}]+/gu))) used.set(w, (used.get(w) ?? 0) + 1);
+      }
+      const words = [...used].sort((a, b) => b[1] - a[1] || a[0].length - b[0].length || (a[0] < b[0] ? -1 : 1)).map(([w]) => w);
+      return { pages, words };
+    }));
+  // a row's text, its part from at, length long, marked
+  const mark = (row, text, at, length) => {
+    const span = row.querySelector('span');
+    const m = span.querySelector('mark');
+    m.textContent = text.slice(at, at + length);
+    span.replaceChildren(text.slice(0, at), m, text.slice(at + length));
+  };
+  const typed = () => input.value.trim().replace(/\s+/g, ' ');
+  const update = () => {
+    const q = typed();
+    if (q.length < 2) return show(quick, '');
+    load().then(({ pages, words }) => {
+      // a later input shows its own
+      if (typed() !== q) return;
+      const lower = q.toLowerCase();
+      const links = pages
+        .map((p) => ({ p, at: p.title.toLowerCase().indexOf(lower) }))
+        .filter(({ at }) => at >= 0)
+        .sort((a, b) => (b.at === 0) - (a.at === 0))
+        .slice(0, 4);
+      const last = lower.split(' ').at(-1);
+      const searches = words.filter((w) => w.startsWith(last)).slice(0, 4).map((w) => lower.slice(0, lower.length - last.length) + w);
+      const nodes = [];
+      const said = [];
+      const section = ({ heading, list, row }, items, fill) => {
+        if (!items.length) return;
+        const rows = list.cloneNode(false);
+        for (const item of items) {
+          const r = row.cloneNode(true);
+          fill(r, item);
+          rows.append(r);
+        }
+        nodes.push(heading.cloneNode(true), rows);
+        said.push(`${items.length} ${heading.textContent}`);
+      };
+      section(sections[0], links, (r, { p, at }) => {
+        r.querySelector('a').href = p.url;
+        mark(r, p.title, at, q.length);
+      });
+      section(sections[1], searches, (r, s) => {
+        const to = new URL(form.action, location.href);
+        to.searchParams.set('q', s);
+        r.querySelector('a').href = to.href;
+        mark(r, s, 0, q.length);
+      });
+      show(nodes, said.length ? `${said.join(' and ')} available` : 'No suggestions');
+    });
+  };
+  input.addEventListener('input', update);
+  // a reset empties the field after its event, which no input follows
+  form.addEventListener('reset', () => show(quick, ''));
 })();

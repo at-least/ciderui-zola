@@ -33,7 +33,7 @@ The settings under `[extra]` (`theme.toml` lists them with their defaults):
 | `logo` | an SVG file in the site, the global nav's logo; required with a nav |
 | `nav` | the global nav's links, `[{ text, href }]`; `[]` for no global nav |
 | `search`, `bag` | the global nav's search and bag pages; `""` for none |
-| `search_flyout` | `true`: the nav's search a button opening the search over the page, which sends what is typed to `search` as `q` (`false`, the default: a link to it) |
+| `search_flyout` | `true`: the nav's search a button opening the search over the page, which sends what is typed to `search` as `q`, and suggests, as two characters or more are typed, the pages whose title holds them and the words they start, from Zola's search index (`false`, the default: a link to it) |
 | `search_links` | the search's quick links, `[{ text, href }]`; `[]` for none |
 | `footer` | `{ copyright, links?, directory?, notes?, shop?, locale? }`, ciderui's footer: `links` `[{ text, href }]`; `directory` columns of sections `[[{ id, title, links }]]`; `notes` and `shop` HTML; `locale` `{ text, href }`; `{}` for no footer |
 | `head` | tags for every page's `<head>`, `[{ tag, attrs?, content? }]` |
@@ -56,7 +56,7 @@ A path in the site (`/news/`) goes through `get_url`, so it holds wherever the s
 
 A page's front matter: `description`, its subhead; `date`; `[extra] category`, its eyebrow; `[extra] image`, its picture in a story or a row (a path Zola resizes, in `static/` or `content/`); `[extra] dark = true`, the whole page dark (`cui-dark`). A section's `[extra.localnav]`, `{ links = [{ text, href }], button = { text, href } }`, gives it and its pages ciderui's local nav, titled with the section's title.
 
-The search page needs Zola's index of the site, in the form the script reads:
+The search page, and the nav's search's suggestions, need Zola's index of the site, in the form the script reads:
 
 ```toml
 build_search_index = true
