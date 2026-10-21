@@ -50,6 +50,9 @@ export const CASES = [
       { heading: 'Shop Mac', links: [{ text: 'Shop Mac', href: '/shop/mac' }, { text: 'Mac Accessories', href: '/shop/mac/accessories' }, { text: 'Financing', href: '/shop/financing' }] },
       { heading: 'More from Mac', links: [{ text: 'Mac Support', href: '/support/mac' }, { text: 'macOS', href: '/macos' }, { text: 'Continuity', href: '/continuity' }] }] },
     { text: 'iPad', href: '/ipad' }, { text: 'Support', href: '/support' }]))}, format="json")} search={f.search} bag={f.bag} /> }}`],
+  ['globalnav/bag', `{%- set f = config.extra -%}{{ <cui_globalnav logo={load_data(path=f.logo, format="plain") | trim} home="/" name="Cider" links={f.nav} search={f.search} bag_flyout={true} bag_message="Your Bag is empty." bag_line={load_data(literal=${str(JSON.stringify({ text: 'Sign in', href: '/signin', rest: ' to see if you have any saved items' }))}, format="json")} bag_heading="My Profile" bag_links={load_data(literal=${str(JSON.stringify([
+    { icon: 'orders', text: 'Orders', href: '/orders' }, { icon: 'saves', text: 'Your Saves', href: '/saves' },
+    { icon: 'account', text: 'Account', href: '/account' }, { icon: 'sign_in', text: 'Sign in', href: '/signin' }]))}, format="json")} /> }}`],
   ['field/field', `{{ <cui_field id="email" kind="email" name="email" label="Email" autocomplete="email" /> }}`],
   ['field/filled', `{{ <cui_field id="zip" kind="text" name="zip" label="ZIP Code" autocomplete="postal-code" value="95014" /> }}`],
   ['footer/footer', `{%- set f = config.extra.footer -%}{{ <cui_footer notes={f.notes} directory={f.directory} shop={f.shop} copyright={f.copyright} links={f.links} locale={f.locale} /> }}`],

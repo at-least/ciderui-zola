@@ -37,7 +37,9 @@
     {%- set icons %}{{ <cz_links links={[{"text": "search", "href": extra.search}, {"text": "bag", "href": extra.bag}]} /> }}{% endset %}
     {%- set icons = load_data(literal=icons, format="json") %}
     {%- set search_links %}{{ <cz_links links={extra.search_links} /> }}{% endset %}
-    {{ <cui_globalnav logo={load_data(path=extra.logo, format="plain") | trim} home={get_url(path="/", trailing_slash=true)} name={config.title} links={load_data(literal=nav, format="json")} search={icons[0].href} bag={icons[1].href} search_flyout={extra.search_flyout} search_links={load_data(literal=search_links, format="json")} /> }}
+    {%- set bag %}{{ <cz_bag line={extra.bag_line} links={extra.bag_links} /> }}{% endset %}
+    {%- set bag = load_data(literal=bag, format="json") %}
+    {{ <cui_globalnav logo={load_data(path=extra.logo, format="plain") | trim} home={get_url(path="/", trailing_slash=true)} name={config.title} links={load_data(literal=nav, format="json")} search={icons[0].href} bag={icons[1].href} search_flyout={extra.search_flyout} search_links={load_data(literal=search_links, format="json")} bag_flyout={extra.bag_flyout} bag_message={extra.bag_message} bag_line={bag.line} bag_heading={extra.bag_heading} bag_links={bag.links} /> }}
     {%- if extra.search_flyout %}
     {%- if not config.build_search_index or config.search.index_format != "fuse_json" %}{{ throw(message="ciderui-zola: the nav's search suggests from Zola's search index: build_search_index = true and [search] index_format = \"fuse_json\"") }}{% endif %}
     {#- its suggestions' sections, which the script fills from the index as

@@ -28,14 +28,18 @@ function icons() {
   if (!found.length) throw new Error(`no icons in ${ICONS}`);
   const branches = found.map(([, name, width, height, viewBox, inner], i) =>
     `{%- ${i ? 'elif' : 'if'} name == "${name.toLowerCase()}" -%}\n<svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="${width}" height="${height}" viewBox="${viewBox}">${inner}</svg>`);
-  return `{#- cui_icon: one of ciderui's icons by its name in the crate, in small letters
-    (more, search, search_compact, bag, bag_compact, searchfield,
-    searchfield_compact, arrow, arrow_compact, suggestion,
-    suggestion_compact, clear, clear_compact, menu, chevron, paddle_previous,
-    paddle_next, check, disclosure, footer_chevron, alert, dropdown, close,
-    close_small), with
-    class on its <svg>. Written by scripts/build.mjs from ciderui's
-    rust/src/icon.rs: not edited by hand. -#}
+  // the names, in lines of 70 characters at most
+  const lines = [''];
+  for (const [, name] of found) {
+    const n = name.toLowerCase();
+    if (lines.at(-1) && lines.at(-1).length + n.length + 2 > 70) lines.push('');
+    lines[lines.length - 1] += lines.at(-1) ? `, ${n}` : n;
+  }
+  return `{#- cui_icon: one of ciderui's icons by its name in the crate, in small
+    letters, with class on its <svg>:
+    ${lines.join(',\n    ')}.
+    Written by scripts/build.mjs from ciderui's rust/src/icon.rs: not edited
+    by hand. -#}
 {% component cui_icon(name, class="") -%}
 ${branches.join('\n')}
 {%- else -%}

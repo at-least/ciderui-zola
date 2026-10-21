@@ -31,13 +31,23 @@
     hero (the crate's GlobalNav); search_flyout, its search a button
     opening the search over the page, sending q to the search page, its
     quick links search_links ([{ text, href }], [] for none) (the crate's
-    Search::Flyout; else Search::Link). -#}
-{% component cui_globalnav(logo, home, name, links, search="", bag="", dark=false, clear=false, search_flyout=false, search_links=[], class="") -%}
+    Search::Flyout; else Search::Link); bag_flyout, its bag a button opening
+    the bag over the page, an empty bag's: its message bag_message, a line
+    under it bag_line ({ text, href, rest }: a link, then the rest of its
+    sentence; {} for none), and its links bag_links ([{ icon, text, href }],
+    the icon one of the crate's by its name, orders, saves, account or
+    sign_in; [] for none) under their heading bag_heading (the crate's
+    Bag::Flyout, BagLink; else Bag::Link). -#}
+{% component cui_globalnav(logo, home, name, links, search="", bag="", dark=false, clear=false, search_flyout=false, search_links=[], bag_flyout=false, bag_message="", bag_line={}, bag_heading="", bag_links=[], class="") -%}
 {%- if not home %}{{ throw(message="ciderui-zola: cui_globalnav needs a home") }}{% endif -%}
 {%- if not name %}{{ throw(message="ciderui-zola: cui_globalnav needs a name") }}{% endif -%}
 {%- if not links %}{{ throw(message="ciderui-zola: cui_globalnav needs links") }}{% endif -%}
 {%- if search_flyout and not search %}{{ throw(message="ciderui-zola: a search flyout needs the site's search page (search)") }}{% endif -%}
 {%- if search_links and not search_flyout %}{{ throw(message="ciderui-zola: search_links are a search flyout's (search_flyout = true)") }}{% endif -%}
+{%- if bag_flyout and not bag_message %}{{ throw(message="ciderui-zola: a bag flyout needs its message (bag_message)") }}{% endif -%}
+{%- if (bag_message or bag_line or bag_links) and not bag_flyout %}{{ throw(message="ciderui-zola: bag_message, bag_line and bag_links are a bag flyout's (bag_flyout = true)") }}{% endif -%}
+{%- if bag_line and not (bag_line.text and bag_line.href) %}{{ throw(message="ciderui-zola: a bag's line needs its link's text and href") }}{% endif -%}
+{%- if bag_links and not bag_heading %}{{ throw(message="ciderui-zola: a bag's links need their heading (bag_heading)") }}{% endif -%}
 <nav class="cui-globalnav{% if dark %} cui-dark{% endif %}{% if class %} {{ class }}{% endif %}"{% if clear %} data-variant="clear"{% endif %} aria-label="Global">
 <div class="cui-globalnav-content">
 <ul class="cui-globalnav-list" id="cui-globalnav-menu" popover>
@@ -81,7 +91,9 @@
 {%- elif search %}
 <li><a class="cui-globalnav-icon" href="{{ search }}" aria-label="Search">{{ <cui_icon name="search" class="cui-globalnav-image" /> }}{{ <cui_icon name="search_compact" class="cui-globalnav-image-compact" /> }}</a></li>
 {%- endif %}
-{%- if bag %}
+{%- if bag_flyout %}
+<li><button class="cui-globalnav-icon" popovertarget="cui-globalnav-bag" aria-label="Bag">{{ <cui_icon name="bag" class="cui-globalnav-image" /> }}{{ <cui_icon name="bag_compact" class="cui-globalnav-image-compact" /> }}</button></li>
+{%- elif bag %}
 <li><a class="cui-globalnav-icon" href="{{ bag }}" aria-label="Bag">{{ <cui_icon name="bag" class="cui-globalnav-image" /> }}{{ <cui_icon name="bag_compact" class="cui-globalnav-image-compact" /> }}</a></li>
 {%- endif %}
 </ul>
@@ -105,6 +117,27 @@
 <button class="cui-globalnav-closebutton" popovertarget="cui-globalnav-search" popovertargetaction="hide" aria-label="Close">{{ <cui_icon name="menu" /> }}</button>
 </div>
 <button class="cui-globalnav-curtain" popovertarget="cui-globalnav-search" popovertargetaction="hide" tabindex="-1" aria-hidden="true"></button>
+</div>
+{%- endif %}
+{%- if bag_flyout %}
+<div class="cui-globalnav-bag" id="cui-globalnav-bag" popover>
+<div class="cui-globalnav-bagpanel">
+<h2 class="cui-globalnav-bagmessage">{{ bag_message }}</h2>
+{%- if bag_line %}
+<p class="cui-globalnav-bagtext"><a href="{{ bag_line.href }}">{{ bag_line.text }}</a>{{ bag_line.rest | default(value="") }}</p>
+{%- endif %}
+{%- if bag_links %}
+<h3 class="cui-globalnav-bagheading" id="cui-globalnav-bagheading">{{ bag_heading }}</h3>
+<ul class="cui-globalnav-baglinks" aria-labelledby="cui-globalnav-bagheading">
+{%- for link in bag_links %}
+{%- if not link.text or not link.href %}{{ throw(message="ciderui-zola: a bag's links need their text and href") }}{% endif %}
+<li><a class="cui-globalnav-baglink" href="{{ link.href }}">{{ <cui_icon name={link.icon} class="cui-globalnav-image" /> }}{{ <cui_icon name={link.icon ~ "_compact"} class="cui-globalnav-image-compact" /> }}{{ link.text }}</a></li>
+{%- endfor %}
+</ul>
+{%- endif %}
+<button class="cui-globalnav-closebutton" popovertarget="cui-globalnav-bag" popovertargetaction="hide" aria-label="Close" autofocus>{{ <cui_icon name="menu" /> }}</button>
+</div>
+<button class="cui-globalnav-curtain" popovertarget="cui-globalnav-bag" popovertargetaction="hide" tabindex="-1" aria-hidden="true"></button>
 </div>
 {%- endif %}
 </div>
@@ -323,6 +356,13 @@
 {% component cz_links(links) -%}
 [{%- for l in links -%}{"text": {{ l.text | json_encode | safe }}, "href": {{ <cz_href href={l.href} /> }}}{% if not loop.last %},{% endif %}{%- endfor -%}]
 {%- endcomponent cz_links %}
+
+{#- cz_bag: the bag's line ({ text, href, rest }, or {}) and links
+    ([{ icon, text, href }]) as JSON for load_data, { line, links }, each
+    href cz_href's. -#}
+{% component cz_bag(line, links) -%}
+{"line": {% if line %}{"text": {{ line.text | json_encode | safe }}, "href": {{ <cz_href href={line.href} /> }}, "rest": {{ line.rest | default(value="") | json_encode | safe }}}{% else %}{}{% endif %}, "links": [{%- for l in links -%}{"icon": {{ l.icon | json_encode | safe }}, "text": {{ l.text | json_encode | safe }}, "href": {{ <cz_href href={l.href} /> }}}{% if not loop.last %},{% endif %}{%- endfor -%}]}
+{%- endcomponent cz_bag %}
 
 {#- cz_nav: the nav's links as cz_links writes them, a link's flyout kept,
     its groups' links' hrefs cz_href's too. -#}
