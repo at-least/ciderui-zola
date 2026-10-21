@@ -33,7 +33,7 @@
   <body>
     {%- if extra.nav %}
     {%- if not extra.logo %}{{ throw(message="ciderui-zola: a global nav needs its logo: logo = \"static/logo.svg\" under [extra]") }}{% endif %}
-    {%- set nav %}{{ <cz_links links={extra.nav} /> }}{% endset %}
+    {%- set nav %}{{ <cz_nav links={extra.nav} /> }}{% endset %}
     {%- set icons %}{{ <cz_links links={[{"text": "search", "href": extra.search}, {"text": "bag", "href": extra.bag}]} /> }}{% endset %}
     {%- set icons = load_data(literal=icons, format="json") %}
     {%- set search_links %}{{ <cz_links links={extra.search_links} /> }}{% endset %}

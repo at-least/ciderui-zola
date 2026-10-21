@@ -40,6 +40,16 @@ export const CASES = [
   ['section/section', `{% <cui_section> %}<p>Content</p>{% </cui_section> %}`],
   ['globalnav/globalnav', `{%- set f = config.extra -%}{{ <cui_globalnav logo={load_data(path=f.logo, format="plain") | trim} home="/" name="Cider" links={f.nav} search={f.search} bag={f.bag} /> }}`],
   ['globalnav/search', `{%- set f = config.extra -%}{{ <cui_globalnav logo={load_data(path=f.logo, format="plain") | trim} home="/" name="Cider" links={f.nav} search={f.search} bag={f.bag} search_flyout={true} search_links={[{"text": "Find a Store", "href": "/retail"}, {"text": "Mac", "href": "/mac"}, {"text": "iPad", "href": "/ipad"}, {"text": "Gift Cards", "href": "/gift-cards"}, {"text": "Support", "href": "/support"}]} /> }}`],
+  // its links as JSON: a Tera literal holds arrays of two dimensions at most
+  ['globalnav/flyout', `{%- set f = config.extra -%}{{ <cui_globalnav logo={load_data(path=f.logo, format="plain") | trim} home="/" name="Cider" links={load_data(literal=${str(JSON.stringify([
+    { text: 'Store', href: '/store', flyout: [
+      { heading: 'Shop', large: [{ text: 'Shop the Latest', href: '/store' }, { text: 'Mac', href: '/shop/mac' }, { text: 'iPad', href: '/shop/ipad' }, { text: 'iPhone', href: '/shop/iphone' }], links: [{ text: 'Accessories', href: '/shop/accessories' }] },
+      { heading: 'Quick Links', links: [{ text: 'Find a Store', href: '/retail' }, { text: 'Order Status', href: '/shop/orders' }, { text: 'Apple Trade In', href: '/shop/trade-in' }] }] },
+    { text: 'Mac', href: '/mac', flyout: [
+      { heading: 'Explore Mac', large: [{ text: 'Explore All Mac', href: '/mac' }, { text: 'MacBook Air', href: '/macbook-air' }, { text: 'MacBook Pro', href: '/macbook-pro' }, { text: 'iMac', href: '/imac' }], links: [{ text: 'Compare Mac', href: '/mac/compare' }] },
+      { heading: 'Shop Mac', links: [{ text: 'Shop Mac', href: '/shop/mac' }, { text: 'Mac Accessories', href: '/shop/mac/accessories' }, { text: 'Financing', href: '/shop/financing' }] },
+      { heading: 'More from Mac', links: [{ text: 'Mac Support', href: '/support/mac' }, { text: 'macOS', href: '/macos' }, { text: 'Continuity', href: '/continuity' }] }] },
+    { text: 'iPad', href: '/ipad' }, { text: 'Support', href: '/support' }]))}, format="json")} search={f.search} bag={f.bag} /> }}`],
   ['field/field', `{{ <cui_field id="email" kind="email" name="email" label="Email" autocomplete="email" /> }}`],
   ['field/filled', `{{ <cui_field id="zip" kind="text" name="zip" label="ZIP Code" autocomplete="postal-code" value="95014" /> }}`],
   ['footer/footer', `{%- set f = config.extra.footer -%}{{ <cui_footer notes={f.notes} directory={f.directory} shop={f.shop} copyright={f.copyright} links={f.links} locale={f.locale} /> }}`],

@@ -14,8 +14,10 @@ homepage = ""
 # - logo: the global nav's logo, an SVG file in the site (static/logo.svg),
 #   drawn inline in currentColor, as ciderui's icons are. Required with a
 #   nav.
-# - nav: the global nav's links, [{ text, href }] (a path in the site, or a
-#   URL); [] for no global nav. search, bag: the global nav's search and
+# - nav: the global nav's links, [{ text, href, flyout? }] (a path in the
+#   site, or a URL); [] for no global nav. A link's flyout, a menu under the
+#   bar (ciderui's), is its groups, [{ heading, large?, links? }], each
+#   [{ text, href }], its large links first. search, bag: the global nav's search and
 #   bag pages ("" for none). search_flyout: the nav's search a button
 #   opening the search over the page, which sends q to the search page and
 #   suggests pages and searches from the site's search index as one types

@@ -17,7 +17,8 @@
 // globalnav/suggestions.html), what was typed marked, a status line saying
 // so; one, or the field cleared, the quick links again, where they were
 // while they stay; none found, no sections; the index fetched once. Fails at
-// the first step that does not end as it says.
+// the first step that does not end as it says. And a nav link's flyout,
+// from the site's nav: shown by the pointer, opened over the menu.
 
 import { existsSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { extname, join } from 'node:path';
@@ -27,10 +28,13 @@ import { CIDERUI, zolaBuild } from './lib.mjs';
 const example = (id) => readFileSync(join(CIDERUI, 'components', id.replace('/', '/examples/') + '.html'), 'utf8');
 const config = readFileSync(new URL('./site/config.toml', import.meta.url), 'utf8');
 if (!config.includes('search = "/search"\n')) throw new Error('test/site/config.toml: no search = "/search" to make a flyout of');
+const MAC = '{ text = "Mac", href = "/mac" }';
+if (!config.includes(MAC)) throw new Error(`test/site/config.toml: no ${MAC} to give a flyout`);
 const { root, out } = zolaBuild('site', {
   'content/behavior/_index.md': '+++\ntitle = "Behavior"\ntemplate = "behavior.html"\n+++\n',
   'templates/behavior.html': `{% extends "base.html" %}\n{% block content %}${example('gallery/gallery')}${example('shelf/paddles')}{% endblock content %}\n`,
-  'config.toml': config.replace('search = "/search"\n', 'search = "/search/"\nsearch_flyout = true\nsearch_links = [{ text = "About", href = "/about/" }]\n'),
+  'config.toml': config.replace('search = "/search"\n', 'search = "/search/"\nsearch_flyout = true\nsearch_links = [{ text = "About", href = "/about/" }]\n')
+    .replace(MAC, '{ text = "Mac", href = "/mac", flyout = [{ heading = "Explore", large = [{ text = "About", href = "/about/" }], links = [{ text = "Quince", href = "/quince/" }, { text = "Elsewhere", href = "https://example.com/" }] }] }'),
   'content/apricot.md': '+++\ntitle = "Apricot"\n+++\nA word on quince.\n',
   'content/quince.md': '+++\ntitle = "Quince"\n+++\nIts copy.\n',
   'content/plum.md': '+++\ntitle = "Plum"\n+++\nIts copy.\n',
@@ -216,6 +220,34 @@ await page.click('.cui-globalnav-searchlinks a[href$="/plum/"]');
 await page.waitForURL('**/plum/');
 check('a suggested link leads to its page', new URL(page.url()).pathname === '/plum/', page.url());
 check('no error with the suggestions', errors.length === 0, errors);
+
+// a nav link's flyout from the site's [extra] nav (base.html, its paths
+// through get_url): from 834px the pointer resting on its link shows it;
+// below, the menu's row opens it over the menu
+await page.goto('https://check.test/about/', { waitUntil: 'load' });
+await page.setViewportSize({ width: 1200, height: 900 });
+const mac = await page.locator('.cui-globalnav-list > li:has(> .cui-globalnav-flyout) > .cui-globalnav-link').boundingBox();
+await page.mouse.move(600, 800);
+await page.mouse.move(mac.x + mac.width / 2, mac.y + mac.height / 2, { steps: 8 });
+await page.waitForTimeout(300);
+const flyout = () => page.evaluate(() => {
+  const f = document.querySelector('.cui-globalnav-flyout');
+  return {
+    shown: getComputedStyle(f).visibility === 'visible', open: f.matches(':popover-open'), menu: document.querySelector('.cui-globalnav-list').matches(':popover-open'),
+    id: f.id, button: f.previousElementSibling.getAttribute('popovertarget'), label: f.previousElementSibling.getAttribute('aria-label'),
+    heading: f.querySelector('.cui-globalnav-flyoutheading').textContent,
+    links: [...f.querySelectorAll('.cui-globalnav-flyoutlink')].map((a) => [a.getAttribute('href'), a.dataset.size ?? '', a.textContent]),
+  };
+});
+r = await flyout();
+check('a nav link\'s flyout from the site\'s nav, its paths the site\'s: the pointer resting on its link shows it', r.shown && !r.open && r.id === 'cui-globalnav-flyout-2' && r.button === r.id && r.label === 'Mac menu' && r.heading === 'Explore'
+  && JSON.stringify(r.links) === JSON.stringify([['https://check.test/about/', 'lg', 'About'], ['https://check.test/quince/', '', 'Quince'], ['https://example.com/', '', 'Elsewhere']]), r);
+await page.setViewportSize({ width: 390, height: 900 });
+await page.click('.cui-globalnav-menubutton');
+await page.click('.cui-globalnav-flyoutbutton');
+await page.waitForTimeout(100);
+r = await flyout();
+check('below 834px, the menu\'s row opens it over the menu', r.open && r.menu, r);
 await browser.close();
 rmSync(root, { recursive: true, force: true });
 console.log(`behavior: ${failures} failures`);

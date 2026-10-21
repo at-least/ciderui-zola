@@ -24,8 +24,10 @@
 {%- endcomponent cui_section %}
 
 {#- cui_globalnav: the bar across the top of the page, the site's logo
-    (HTML: an <svg> in currentColor), its links ([{ text, href }]), its
-    search and bag pages if it has them ("" if not), dark, clear over a
+    (HTML: an <svg> in currentColor), its links ([{ text, href, flyout? }],
+    a link's flyout its groups, [{ heading, large?, links? }], its large
+    links first, each [{ text, href }]: the crate's NavLink, FlyoutGroup),
+    its search and bag pages if it has them ("" if not), dark, clear over a
     hero (the crate's GlobalNav); search_flyout, its search a button
     opening the search over the page, sending q to the search page, its
     quick links search_links ([{ text, href }], [] for none) (the crate's
@@ -42,7 +44,37 @@
 <li><a class="cui-globalnav-logo" href="{{ home }}" aria-label="{{ name }}">{{ logo | safe }}</a></li>
 <li><button class="cui-globalnav-closebutton" popovertarget="cui-globalnav-menu" popovertargetaction="hide" aria-label="Close" autofocus>{{ <cui_icon name="menu" /> }}</button></li>
 {%- for link in links %}
+{%- if link.flyout is defined and link.flyout %}
+{%- set id = "cui-globalnav-flyout-" ~ loop.index %}
+<li>
+<a class="cui-globalnav-link" href="{{ link.href }}">{{ link.text }}</a>
+<button class="cui-globalnav-flyoutbutton" popovertarget="{{ id }}" aria-label="{{ link.text }} menu">{{ <cui_icon name="flyout" class="cui-globalnav-image" /> }}{{ <cui_icon name="flyout_compact" class="cui-globalnav-image-compact" /> }}</button>
+<div class="cui-globalnav-flyout" id="{{ id }}" popover>
+<div class="cui-globalnav-flyoutpanel">
+<button class="cui-globalnav-backbutton" popovertarget="{{ id }}" popovertargetaction="hide" aria-label="Main menu">{{ <cui_icon name="flyout_back" /> }}</button>
+<button class="cui-globalnav-closebutton" popovertarget="cui-globalnav-menu" popovertargetaction="hide" aria-label="Close">{{ <cui_icon name="menu" /> }}</button>
+{%- for group in link.flyout %}
+{%- if not group.heading %}{{ throw(message="ciderui-zola: a cui_globalnav flyout's group needs its heading") }}{% endif %}
+{%- set heading = id ~ "-" ~ loop.index %}
+<div class="cui-globalnav-flyoutgroup">
+<h2 class="cui-globalnav-flyoutheading" id="{{ heading }}">{{ group.heading }}</h2>
+<ul class="cui-globalnav-flyoutlinks" aria-labelledby="{{ heading }}">
+{%- for l in group.large | default(value=[]) %}
+<li><a class="cui-globalnav-flyoutlink" data-size="lg" href="{{ l.href }}">{{ l.text }}</a></li>
+{%- endfor %}
+{%- for l in group.links | default(value=[]) %}
+<li><a class="cui-globalnav-flyoutlink" href="{{ l.href }}">{{ l.text }}</a></li>
+{%- endfor %}
+</ul>
+</div>
+{%- endfor %}
+</div>
+<button class="cui-globalnav-curtain" popovertarget="{{ id }}" popovertargetaction="hide" tabindex="-1" aria-hidden="true"></button>
+</div>
+</li>
+{%- else %}
 <li><a class="cui-globalnav-link" href="{{ link.href }}">{{ link.text }}</a></li>
+{%- endif %}
 {%- endfor %}
 {%- if search and search_flyout %}
 <li><button class="cui-globalnav-icon" popovertarget="cui-globalnav-search" aria-label="Search">{{ <cui_icon name="search" class="cui-globalnav-image" /> }}{{ <cui_icon name="search_compact" class="cui-globalnav-image-compact" /> }}</button></li>
@@ -278,11 +310,22 @@
 {%- endif -%}
 {%- endcomponent cui_page_media %}
 
-{#- cz_links: links ([{ text, href }]) as JSON for load_data, each href a
-    path in the site (/privacy/) through get_url, so it holds under
-    base_url wherever the site is served, its trailing slash kept; a URL as
-    it is. For base.html's nav and footer, whose components write their
+{#- cz_href: an href as JSON, a path in the site (/privacy/) through
+    get_url, so it holds under base_url wherever the site is served, its
+    trailing slash kept; a URL as it is. -#}
+{% component cz_href(href) -%}
+{{ (get_url(path=href, trailing_slash=href is matching(pat="/$")) if href is matching(pat="^/(?:[^/]|$)") else href) | json_encode | safe }}
+{%- endcomponent cz_href %}
+
+{#- cz_links: links ([{ text, href }]) as JSON for load_data, each href
+    cz_href's. For base.html's nav and footer, whose components write their
     hrefs as given. -#}
 {% component cz_links(links) -%}
-[{%- for l in links -%}{"text": {{ l.text | json_encode | safe }}, "href": {{ (get_url(path=l.href, trailing_slash=l.href is matching(pat="/$")) if l.href is matching(pat="^/(?:[^/]|$)") else l.href) | json_encode | safe }}}{% if not loop.last %},{% endif %}{%- endfor -%}]
+[{%- for l in links -%}{"text": {{ l.text | json_encode | safe }}, "href": {{ <cz_href href={l.href} /> }}}{% if not loop.last %},{% endif %}{%- endfor -%}]
 {%- endcomponent cz_links %}
+
+{#- cz_nav: the nav's links as cz_links writes them, a link's flyout kept,
+    its groups' links' hrefs cz_href's too. -#}
+{% component cz_nav(links) -%}
+[{%- for l in links -%}{"text": {{ l.text | json_encode | safe }}, "href": {{ <cz_href href={l.href} /> }}{% if l.flyout is defined %}, "flyout": [{%- for g in l.flyout -%}{"heading": {{ g.heading | default(value="") | json_encode | safe }}, "large": {{ <cz_links links={g.large | default(value=[])} /> }}, "links": {{ <cz_links links={g.links | default(value=[])} /> }}}{% if not loop.last %},{% endif %}{%- endfor -%}]{% endif %}}{% if not loop.last %},{% endif %}{%- endfor -%}]
+{%- endcomponent cz_nav %}

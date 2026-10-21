@@ -35,6 +35,12 @@
 <svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M8 0A8 8 0 1 0 8 16 8 8 0 1 0 8 0ZM8.9475 8 11.2838 10.3362A.67.67 0 0 1 10.3362 11.2838L8 8.9475 5.6638 11.2838A.67.67 0 0 1 4.7162 10.3362L7.0525 8 4.7162 5.6638A.67.67 0 0 1 5.6638 4.7162L8 7.0525 10.3362 4.7162A.67.67 0 0 1 11.2838 5.6638Z" fill="currentColor" fill-rule="evenodd"/></svg>
 {%- elif name == "menu" -%}
 <svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="18" height="18" viewBox="0 0 18 18"><path d="M2 5H16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M2 12H16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+{%- elif name == "flyout" -%}
+<svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="10" height="10" viewBox="0 0 10 10"><path d="M2.33 3.66 5 6.34 7.67 3.66" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width=".88"/></svg>
+{%- elif name == "flyout_compact" -%}
+<svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="9" height="48" viewBox="0 0 9 48"><path d="M1.3 17.21 8.3 24.07 1.3 30.79" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"/></svg>
+{%- elif name == "flyout_back" -%}
+<svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="9" height="48" viewBox="0 0 9 48"><path d="M7.7 17.21 .7 24.07 7.7 30.79" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"/></svg>
 {%- elif name == "chevron" -%}
 <svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="16" height="9" viewBox="0 0 16 9"><path d="M15.265.835 8 8.167.735.835" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
 {%- elif name == "paddle_previous" -%}

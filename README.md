@@ -31,7 +31,7 @@ The settings under `[extra]` (`theme.toml` lists them with their defaults):
 | setting | what |
 | --- | --- |
 | `logo` | an SVG file in the site, the global nav's logo; required with a nav |
-| `nav` | the global nav's links, `[{ text, href }]`; `[]` for no global nav |
+| `nav` | the global nav's links, `[{ text, href, flyout? }]`; `[]` for no global nav. A link's `flyout`, ciderui's menu under the bar (the pointer resting on the link shows it, its button opens it, a phone's menu opens it over itself), is its groups, `[{ heading, large?, links? }]`, each `[{ text, href }]`, the large links first |
 | `search`, `bag` | the global nav's search and bag pages; `""` for none |
 | `search_flyout` | `true`: the nav's search a button opening the search over the page, which sends what is typed to `search` as `q`, and suggests, as two characters or more are typed, the pages whose title holds them and the words they start, from Zola's search index (`false`, the default: a link to it) |
 | `search_links` | the search's quick links, `[{ text, href }]`; `[]` for none |
