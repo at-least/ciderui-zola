@@ -120,8 +120,10 @@
 // holds what was typed (Suggested Links, those starting with it first) and
 // the words of the pages' titles and descriptions its last word starts
 // (Suggested Searches, each sent to the search page as q, the words the most
-// pages use first), four of each, what was typed marked; with fewer, or the
-// field cleared, the quick links again. Zola's index (fuse_json, the
+// pages use first), five of each as apple.com's, what was typed marked; with
+// fewer, or the field cleared, the quick links again (apple.com's clear
+// button leaves its suggestions until something is typed: its script
+// returns before drawing its quick links). Zola's index (fuse_json, the
 // template's data-index) is fetched once, when first needed, the search
 // page left out; a status line, read aloud and not shown (cz-status), says
 // what the suggestions hold, as apple.com's. Without the script, the quick
@@ -140,8 +142,14 @@
   status.className = 'cz-status';
   status.setAttribute('role', 'status');
   form.after(status);
+  // what the status line says of the quick links, as apple.com's does when
+  // they come back
+  const list = quick.find((n) => n.matches('ul'));
+  const quickSaid = list ? `${list.children.length} ${list.previousElementSibling.textContent} available` : '';
   let shown = quick;
+  // what is shown already stays: put back, its rows would fade in again
   const show = (nodes, said) => {
+    if (nodes === shown) return;
     for (const n of shown) n.remove();
     close.before(...nodes);
     shown = nodes;
@@ -174,7 +182,7 @@
   const typed = () => input.value.trim().replace(/\s+/g, ' ');
   const update = () => {
     const q = typed();
-    if (q.length < 2) return show(quick, '');
+    if (q.length < 2) return show(quick, quickSaid);
     load().then(({ pages, words }) => {
       // a later input shows its own
       if (typed() !== q) return;
@@ -183,9 +191,9 @@
         .map((p) => ({ p, at: p.title.toLowerCase().indexOf(lower) }))
         .filter(({ at }) => at >= 0)
         .sort((a, b) => (b.at === 0) - (a.at === 0))
-        .slice(0, 4);
+        .slice(0, 5);
       const last = lower.split(' ').at(-1);
-      const searches = words.filter((w) => w.startsWith(last)).slice(0, 4).map((w) => lower.slice(0, lower.length - last.length) + w);
+      const searches = words.filter((w) => w.startsWith(last)).slice(0, 5).map((w) => lower.slice(0, lower.length - last.length) + w);
       const nodes = [];
       const said = [];
       const section = ({ heading, list, row }, items, fill) => {
@@ -214,5 +222,5 @@
   };
   input.addEventListener('input', update);
   // a reset empties the field after its event, which no input follows
-  form.addEventListener('reset', () => show(quick, ''));
+  form.addEventListener('reset', () => show(quick, quickSaid));
 })();

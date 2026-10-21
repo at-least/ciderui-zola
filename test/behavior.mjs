@@ -13,9 +13,10 @@
 // own field sends q again. And its suggestions, two more pages here (A Plum
 // Cake before Plum in the index): two characters typed, the pages whose
 // title holds them, those starting with them first, and the words they
-// start, as ciderui's rows (its globalnav/suggestions.html), what was typed
-// marked, a status line saying so; one, or the field cleared, the quick
-// links again; none found, no sections; the index fetched once. Fails at
+// start, five of each at most, as ciderui's rows (its
+// globalnav/suggestions.html), what was typed marked, a status line saying
+// so; one, or the field cleared, the quick links again, where they were
+// while they stay; none found, no sections; the index fetched once. Fails at
 // the first step that does not end as it says.
 
 import { existsSync, readFileSync, rmSync, statSync } from 'node:fs';
@@ -177,8 +178,11 @@ const typed = async (keys, said) => {
 await page.goto('https://check.test/about/', { waitUntil: 'load' });
 await page.click('.cui-globalnav-icon[popovertarget="cui-globalnav-search"]');
 await page.waitForTimeout(400);
+// the panel's children taken out or put in as it is typed
+await page.evaluate(() => { window.czMoved = 0; new MutationObserver((records) => { window.czMoved += records.length; }).observe(document.querySelector('.cui-globalnav-searchpanel'), { childList: true }); });
 r = await typed('p');
-check('one character typed: the quick links', JSON.stringify(r.headings) === '["Quick Links"]' && JSON.stringify(r.sections) === '[[["/about/",null,"About"]]]' && r.status === '' && fetched === 0, { ...r, fetched });
+const kept = await page.evaluate(() => window.czMoved === 0);
+check('one character typed: the quick links, their rows where they were (put back, they would fade in again)', JSON.stringify(r.headings) === '["Quick Links"]' && JSON.stringify(r.sections) === '[[["/about/",null,"About"]]]' && r.status === '' && fetched === 0 && kept, { ...r, fetched, kept });
 r = await typed('l', '2 Suggested Links and 1 Suggested Searches available');
 check('two: the pages whose title holds them, those starting with them first, and the words they start, what was typed marked; a status line saying so',
   JSON.stringify(r.headings) === '["Suggested Links","Suggested Searches"]'
@@ -188,7 +192,7 @@ check('muted, what was typed in the rows\' color (ciderui\'s, while a row marks 
 await page.keyboard.press('Backspace');
 await page.waitForTimeout(100);
 r = await suggestions();
-check('back to one: the quick links again', JSON.stringify(r.headings) === '["Quick Links"]' && r.status === '', r);
+check('back to one: the quick links again, the status line saying so, as apple.com\'s', JSON.stringify(r.headings) === '["Quick Links"]' && r.status === '1 Quick Links available', r);
 r = await typed('lx', 'No suggestions');
 check('none found: no sections, the status line saying so', r.headings.length === 0, r);
 await page.fill('.cui-globalnav-searchinput', '');
@@ -200,7 +204,11 @@ check('the search page is not a suggested link', r.sections.length > 0 && !r.sec
 await page.click('.cui-globalnav-searchreset');
 await page.waitForTimeout(100);
 r = await suggestions();
-check('its clear button: the field empty, the quick links again', r.value === '' && JSON.stringify(r.headings) === '["Quick Links"]' && r.status === '', r);
+check('its clear button: the field empty, the quick links again', r.value === '' && JSON.stringify(r.headings) === '["Quick Links"]' && r.status === '1 Quick Links available', r);
+await page.focus('.cui-globalnav-searchinput');
+r = await typed('st', null);
+check('five of each at most, as apple.com\'s (seven stories start with it)', r.sections[0].length === 5 && r.sections[0].every(([href]) => href.startsWith('/news/story-')) && r.sections.every((rows) => rows.length <= 5), r);
+await page.fill('.cui-globalnav-searchinput', '');
 check('the index fetched once', fetched === 1, fetched);
 await page.focus('.cui-globalnav-searchinput');
 await typed('plu', null);
