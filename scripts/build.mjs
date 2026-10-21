@@ -31,8 +31,8 @@ function icons() {
   return `{#- cui_icon: one of ciderui's icons by its name in the crate, in small letters
     (more, search, search_compact, bag, bag_compact, searchfield,
     searchfield_compact, arrow, arrow_compact, menu, chevron, paddle_previous,
-    paddle_next, check, disclosure, footer_chevron, alert, dropdown, close),
-    with
+    paddle_next, check, disclosure, footer_chevron, alert, dropdown, close,
+    close_small), with
     class on its <svg>. Written by scripts/build.mjs from ciderui's
     rust/src/icon.rs: not edited by hand. -#}
 {% component cui_icon(name, class="") -%}
