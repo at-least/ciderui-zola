@@ -26,11 +26,16 @@
 {#- cui_globalnav: the bar across the top of the page, the site's logo
     (HTML: an <svg> in currentColor), its links ([{ text, href }]), its
     search and bag pages if it has them ("" if not), dark, clear over a
-    hero (the crate's GlobalNav). -#}
-{% component cui_globalnav(logo, home, name, links, search="", bag="", dark=false, clear=false, class="") -%}
+    hero (the crate's GlobalNav); search_flyout, its search a button
+    opening the search over the page, sending q to the search page, its
+    quick links search_links ([{ text, href }], [] for none) (the crate's
+    Search::Flyout; else Search::Link). -#}
+{% component cui_globalnav(logo, home, name, links, search="", bag="", dark=false, clear=false, search_flyout=false, search_links=[], class="") -%}
 {%- if not home %}{{ throw(message="ciderui-zola: cui_globalnav needs a home") }}{% endif -%}
 {%- if not name %}{{ throw(message="ciderui-zola: cui_globalnav needs a name") }}{% endif -%}
 {%- if not links %}{{ throw(message="ciderui-zola: cui_globalnav needs links") }}{% endif -%}
+{%- if search_flyout and not search %}{{ throw(message="ciderui-zola: a search flyout needs the site's search page (search)") }}{% endif -%}
+{%- if search_links and not search_flyout %}{{ throw(message="ciderui-zola: search_links are a search flyout's (search_flyout = true)") }}{% endif -%}
 <nav class="cui-globalnav{% if dark %} cui-dark{% endif %}{% if class %} {{ class }}{% endif %}"{% if clear %} data-variant="clear"{% endif %} aria-label="Global">
 <div class="cui-globalnav-content">
 <ul class="cui-globalnav-list" id="cui-globalnav-menu" popover>
@@ -39,7 +44,9 @@
 {%- for link in links %}
 <li><a class="cui-globalnav-link" href="{{ link.href }}">{{ link.text }}</a></li>
 {%- endfor %}
-{%- if search %}
+{%- if search and search_flyout %}
+<li><button class="cui-globalnav-icon" popovertarget="cui-globalnav-search" aria-label="Search">{{ <cui_icon name="search" class="cui-globalnav-image" /> }}{{ <cui_icon name="search_compact" class="cui-globalnav-image-compact" /> }}</button></li>
+{%- elif search %}
 <li><a class="cui-globalnav-icon" href="{{ search }}" aria-label="Search">{{ <cui_icon name="search" class="cui-globalnav-image" /> }}{{ <cui_icon name="search_compact" class="cui-globalnav-image-compact" /> }}</a></li>
 {%- endif %}
 {%- if bag %}
@@ -47,6 +54,27 @@
 {%- endif %}
 </ul>
 <button class="cui-globalnav-menubutton" popovertarget="cui-globalnav-menu" aria-label="Menu">{{ <cui_icon name="menu" /> }}</button>
+{%- if search_flyout %}
+<div class="cui-globalnav-search" id="cui-globalnav-search" popover>
+<div class="cui-globalnav-searchpanel">
+<form class="cui-globalnav-searchfield" action="{{ search }}" method="get" role="search">
+{{ <cui_icon name="searchfield" class="cui-globalnav-image" /> }}{{ <cui_icon name="searchfield_compact" class="cui-globalnav-image-compact" /> }}
+<input class="cui-globalnav-searchinput" type="text" name="q" placeholder="Search" aria-label="Search" autocomplete="off" autocapitalize="off" autofocus>
+<button class="cui-globalnav-searchreset" type="reset" aria-label="Clear search">{{ <cui_icon name="clear" class="cui-globalnav-image" /> }}{{ <cui_icon name="clear_compact" class="cui-globalnav-image-compact" /> }}</button>
+</form>
+{%- if search_links %}
+<h2 class="cui-globalnav-searchheading" id="cui-globalnav-searchheading">Quick Links</h2>
+<ul class="cui-globalnav-searchlinks" aria-labelledby="cui-globalnav-searchheading">
+{%- for link in search_links %}
+<li><a class="cui-globalnav-searchlink" href="{{ link.href }}">{{ <cui_icon name="arrow" class="cui-globalnav-image" /> }}{{ <cui_icon name="arrow_compact" class="cui-globalnav-image-compact" /> }}{{ link.text }}</a></li>
+{%- endfor %}
+</ul>
+{%- endif %}
+<button class="cui-globalnav-closebutton" popovertarget="cui-globalnav-search" popovertargetaction="hide" aria-label="Close">{{ <cui_icon name="menu" /> }}</button>
+</div>
+<button class="cui-globalnav-curtain" popovertarget="cui-globalnav-search" popovertargetaction="hide" tabindex="-1" aria-hidden="true"></button>
+</div>
+{%- endif %}
 </div>
 </nav>
 {%- endcomponent cui_globalnav %}
@@ -159,6 +187,16 @@
 <ul class="cui-posts-list">{{ body | safe }}</ul>
 </section>
 {%- endcomponent cui_posts %}
+
+{#- cui_field: a text field, its label the placeholder until it is focused
+    or filled, its input's id, type (kind), name, autocomplete ("" for
+    none) and value ("" for none) (the crate's Field, in no error, enabled,
+    with no prefix). -#}
+{% component cui_field(id, kind, name, label, autocomplete="", value="", class="") -%}
+{%- if not id %}{{ throw(message="ciderui-zola: cui_field needs an id") }}{% endif -%}
+{%- if not label %}{{ throw(message="ciderui-zola: cui_field needs a label") }}{% endif -%}
+<div class="cui-field{% if class %} {{ class }}{% endif %}"><input class="cui-field-input" id="{{ id }}" type="{{ kind }}" name="{{ name }}" placeholder=" "{% if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}{% if value %} value="{{ value }}"{% endif %}><label class="cui-field-label" for="{{ id }}">{{ label }}</label></div>
+{%- endcomponent cui_field %}
 
 {#- cui_post: a row, its picture (HTML: an <img class="cui-post-media">,
     "" for none), its category, its headline, its date (the crate's

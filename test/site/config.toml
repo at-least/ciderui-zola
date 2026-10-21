@@ -6,7 +6,12 @@ title = "ciderui-zola checks"
 description = "The pages ciderui-zola's checks build."
 theme = "ciderui-zola"
 compile_sass = false
-build_search_index = false
+build_search_index = true
+
+# the search page's index (search.html)
+[search]
+index_format = "fuse_json"
+include_description = true
 
 [markdown]
 bottom_footnotes = true

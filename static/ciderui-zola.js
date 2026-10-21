@@ -5,7 +5,8 @@
 // settling it, and the one at an end is disabled; a gallery's dots
 // (cui-gallery-dot, a link to an item) scroll the row to their item, and the
 // dot of the item the row shows is aria-current. Without it the rows still
-// scroll and snap, and a dot is a link.
+// scroll and snap, and a dot is a link. And the search page's results
+// (search.html), which need a script to be found.
 
 (() => {
   const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
@@ -66,4 +67,48 @@
     }
     update();
   }
+})();
+
+// the search page (search.html, its form cz-search): the query (?q=) in its
+// field, and the pages of Zola's search index (fuse_json, its address the
+// form's data-index) whose title, description or text hold each of its
+// words, those whose title holds the most of them first, each a row cloned
+// from the page's template (cz-search-results, a cui-posts holding one row),
+// after it; none, its heading says so. Without the script, the field alone.
+(() => {
+  const form = document.querySelector('.cz-search');
+  if (!form) return;
+  const query = (new URLSearchParams(location.search).get('q') ?? '').trim();
+  form.elements.q.value = query;
+  if (!query) return;
+  const template = document.querySelector('template.cz-search-results');
+  if (!template) throw new Error('ciderui-zola: the search page has no results template (template.cz-search-results)');
+  const words = query.toLowerCase().split(/\s+/);
+  const here = new URL(form.action, location.href).pathname;
+  fetch(form.dataset.index)
+    .then((res) => {
+      if (!res.ok) throw new Error(`ciderui-zola: the search index ${form.dataset.index}: ${res.status}`);
+      return res.json();
+    })
+    .then((pages) => {
+      const hits = pages
+        .filter((p) => p.title && new URL(p.url).pathname !== here)
+        .filter((p) => words.every((w) => `${p.title} ${p.description ?? ''} ${p.body}`.toLowerCase().includes(w)))
+        .map((p) => ({ p, score: words.filter((w) => p.title.toLowerCase().includes(w)).length }))
+        .sort((a, b) => b.score - a.score)
+        .map(({ p }) => p);
+      const results = template.content.cloneNode(true);
+      const list = results.querySelector('.cui-posts-list');
+      const row = list.firstElementChild;
+      row.remove();
+      results.querySelector('.cui-posts-heading').textContent = `${hits.length ? 'Results' : 'No results'} for “${query}”`;
+      for (const p of hits) {
+        const r = row.cloneNode(true);
+        r.querySelector('.cui-post').href = p.url;
+        r.querySelector('.cui-post-headline').textContent = p.title;
+        list.append(r);
+      }
+      if (!hits.length) list.remove();
+      template.after(results);
+    });
 })();

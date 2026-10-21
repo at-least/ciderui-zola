@@ -16,7 +16,12 @@ homepage = ""
 #   nav.
 # - nav: the global nav's links, [{ text, href }] (a path in the site, or a
 #   URL); [] for no global nav. search, bag: the global nav's search and
-#   bag pages ("" for none).
+#   bag pages ("" for none). search_flyout: the nav's search a button
+#   opening the search over the page, which sends q to the search page
+#   (false: a link to it); search_links, its quick links, [{ text, href }].
+#   A search page of the site's own: a page with template = "search.html",
+#   which needs build_search_index = true and [search] index_format =
+#   "fuse_json".
 # - footer: { copyright, links?, directory?, notes?, shop?, locale? }, the
 #   footer's (ciderui's cui-footer: links [{ text, href }]; directory
 #   columns of sections [[{ id, title, links }]]; notes and shop HTML;
@@ -28,6 +33,8 @@ homepage = ""
 logo = ""
 nav = []
 search = ""
+search_flyout = false
+search_links = []
 bag = ""
 footer = {}
 head = []

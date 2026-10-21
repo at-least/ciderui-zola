@@ -36,7 +36,8 @@
     {%- set nav %}{{ <cz_links links={extra.nav} /> }}{% endset %}
     {%- set icons %}{{ <cz_links links={[{"text": "search", "href": extra.search}, {"text": "bag", "href": extra.bag}]} /> }}{% endset %}
     {%- set icons = load_data(literal=icons, format="json") %}
-    {{ <cui_globalnav logo={load_data(path=extra.logo, format="plain") | trim} home={get_url(path="/", trailing_slash=true)} name={config.title} links={load_data(literal=nav, format="json")} search={icons[0].href} bag={icons[1].href} /> }}
+    {%- set search_links %}{{ <cz_links links={extra.search_links} /> }}{% endset %}
+    {{ <cui_globalnav logo={load_data(path=extra.logo, format="plain") | trim} home={get_url(path="/", trailing_slash=true)} name={config.title} links={load_data(literal=nav, format="json")} search={icons[0].href} bag={icons[1].href} search_flyout={extra.search_flyout} search_links={load_data(literal=search_links, format="json")} /> }}
     {%- endif %}
     <main id="main" class="cz-main">
       {% block content %}{% endblock content %}
