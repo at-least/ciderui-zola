@@ -122,6 +122,7 @@
 {%- if bag_flyout %}
 <div class="cui-globalnav-bag" id="cui-globalnav-bag" popover>
 <div class="cui-globalnav-bagpanel">
+<button class="cui-globalnav-closebutton" popovertarget="cui-globalnav-bag" popovertargetaction="hide" aria-label="Close" autofocus>{{ <cui_icon name="menu" /> }}</button>
 <h2 class="cui-globalnav-bagmessage">{{ bag_message }}</h2>
 {%- if bag_line %}
 <p class="cui-globalnav-bagtext"><a href="{{ bag_line.href }}">{{ bag_line.text }}</a>{{ bag_line.rest | default(value="") }}</p>
@@ -135,7 +136,6 @@
 {%- endfor %}
 </ul>
 {%- endif %}
-<button class="cui-globalnav-closebutton" popovertarget="cui-globalnav-bag" popovertargetaction="hide" aria-label="Close" autofocus>{{ <cui_icon name="menu" /> }}</button>
 </div>
 <button class="cui-globalnav-curtain" popovertarget="cui-globalnav-bag" popovertargetaction="hide" tabindex="-1" aria-hidden="true"></button>
 </div>
@@ -184,9 +184,7 @@
 <p class="cui-footer-copyright">{{ copyright }}</p>
 {%- if links %}
 <ul class="cui-footer-links">
-{%- for link in links %}
-<li><a href="{{ link.href }}">{{ link.text }}</a></li>
-{%- endfor %}
+{%- for link in links %}{% if not loop.first %} {% endif %}<li><a href="{{ link.href }}">{{ link.text }}</a></li>{% endfor %}
 </ul>
 {%- endif %}
 {%- if locale %}
