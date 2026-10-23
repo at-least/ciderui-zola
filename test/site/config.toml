@@ -29,19 +29,19 @@ dark_theme = "github-dark"
 logo = "static/logo.svg"
 nav = [
   { text = "Store", href = "/store" },
-  { text = "Mac", href = "/mac" },
-  { text = "iPad", href = "/ipad" },
+  { text = "Laptops", href = "/laptops" },
+  { text = "Tablets", href = "/tablets" },
   { text = "Support", href = "/support" },
 ]
 search = "/search"
 bag = "/bag"
 
 [extra.footer]
-notes = '<p>Trade-in values vary. See <a href="/shop/trade-in/">apple.com/shop/trade-in</a> for details.</p>'
+notes = '<p>Trade-in values vary. See <a href="/shop/trade-in/">example.com/shop/trade-in</a> for details.</p>'
 directory = [
   [
-    { id = "footer-shop", title = "Shop and Learn", links = [{ text = "Store", href = "/store/" }, { text = "Mac", href = "/mac/" }, { text = "iPhone", href = "/iphone/" }] },
-    { id = "footer-wallet", title = "Apple Wallet", links = [{ text = "Wallet", href = "/wallet/" }, { text = "Apple Card", href = "/apple-card/" }] },
+    { id = "footer-shop", title = "Shop and Learn", links = [{ text = "Store", href = "/store/" }, { text = "Laptops", href = "/laptops/" }, { text = "Phones", href = "/phones/" }] },
+    { id = "footer-wallet", title = "Payments", links = [{ text = "Wallet", href = "/wallet/" }, { text = "Cider Card", href = "/cider-card/" }] },
   ],
   [
     { id = "footer-account", title = "Account", links = [{ text = "Manage Your Account", href = "/account/" }, { text = "Store Account", href = "/shop/account/" }] },

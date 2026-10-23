@@ -28,13 +28,13 @@ import { CIDERUI, zolaBuild } from './lib.mjs';
 const example = (id) => readFileSync(join(CIDERUI, 'components', id.replace('/', '/examples/') + '.html'), 'utf8');
 const config = readFileSync(new URL('./site/config.toml', import.meta.url), 'utf8');
 if (!config.includes('search = "/search"\n')) throw new Error('test/site/config.toml: no search = "/search" to make a flyout of');
-const MAC = '{ text = "Mac", href = "/mac" }';
+const MAC = '{ text = "Laptops", href = "/laptops" }';
 if (!config.includes(MAC)) throw new Error(`test/site/config.toml: no ${MAC} to give a flyout`);
 const { root, out } = zolaBuild('site', {
   'content/behavior/_index.md': '+++\ntitle = "Behavior"\ntemplate = "behavior.html"\n+++\n',
   'templates/behavior.html': `{% extends "base.html" %}\n{% block content %}${example('gallery/gallery')}${example('shelf/paddles')}{% endblock content %}\n`,
   'config.toml': config.replace('search = "/search"\n', 'search = "/search/"\nsearch_flyout = true\nsearch_links = [{ text = "About", href = "/about/" }]\n')
-    .replace(MAC, '{ text = "Mac", href = "/mac", flyout = [{ heading = "Explore", large = [{ text = "About", href = "/about/" }], links = [{ text = "Quince", href = "/quince/" }, { text = "Elsewhere", href = "https://example.com/" }] }] }'),
+    .replace(MAC, '{ text = "Laptops", href = "/laptops", flyout = [{ heading = "Explore", large = [{ text = "About", href = "/about/" }], links = [{ text = "Quince", href = "/quince/" }, { text = "Elsewhere", href = "https://example.com/" }] }] }'),
   'content/apricot.md': '+++\ntitle = "Apricot"\n+++\nA word on quince.\n',
   'content/quince.md': '+++\ntitle = "Quince"\n+++\nIts copy.\n',
   'content/plum.md': '+++\ntitle = "Plum"\n+++\nIts copy.\n',
@@ -150,7 +150,7 @@ check('no error on the search pages', errors.length === 0, errors);
 const order = JSON.parse(readFileSync(join(out, 'search_index.en.json'), 'utf8')).map((p) => new URL(p.url).pathname);
 if (!(order.indexOf('/a-plum-cake/') < order.indexOf('/plum/'))) throw new Error(`the index has Plum before A Plum Cake: ${order}`);
 const ciderui = readFileSync(join(CIDERUI, 'components/globalnav/examples/suggestions.html'), 'utf8').split('\n').map((l) => l.trim());
-const exampleRows = ['href="/mac"', 'href="/search?q=mac"'].map((href) => ciderui.find((l) => l.includes(`class="cui-globalnav-searchlink" ${href}`)));
+const exampleRows = ['href="/laptops"', 'href="/search?q=laptop"'].map((href) => ciderui.find((l) => l.includes(`class="cui-globalnav-searchlink" ${href}`)));
 let fetched = 0;
 page.on('request', (req) => { if (req.url().includes('search_index')) fetched++; });
 const suggestions = () => page.evaluate((exampleRows) => {
@@ -240,7 +240,7 @@ const flyout = () => page.evaluate(() => {
   };
 });
 r = await flyout();
-check('a nav link\'s flyout from the site\'s nav, its paths the site\'s: the pointer resting on its link shows it', r.shown && !r.open && r.id === 'cui-globalnav-flyout-2' && r.button === r.id && r.label === 'Mac menu' && r.heading === 'Explore'
+check('a nav link\'s flyout from the site\'s nav, its paths the site\'s: the pointer resting on its link shows it', r.shown && !r.open && r.id === 'cui-globalnav-flyout-2' && r.button === r.id && r.label === 'Laptops menu' && r.heading === 'Explore'
   && JSON.stringify(r.links) === JSON.stringify([['https://check.test/about/', 'lg', 'About'], ['https://check.test/quince/', '', 'Quince'], ['https://example.com/', '', 'Elsewhere']]), r);
 await page.setViewportSize({ width: 390, height: 900 });
 await page.click('.cui-globalnav-menubutton');
