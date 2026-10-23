@@ -85,3 +85,11 @@ npm test        # the build is current; the markup, the styles, the skeleton, th
 ```
 
 Rebuild after ciderui changes, and name ciderui's commit in the rebuild's commit message.
+
+## License
+
+MIT (`LICENSE`). Inter, in `static/fonts/`, is the Inter Project Authors', under the SIL Open Font License 1.1 (`LICENSE-Inter`).
+
+## Apple
+
+The theme draws ciderui's look; what ciderui takes from apple.com is measured on its pages and recorded in ciderui's `reference/`. No Apple stylesheet, font, image or logo is in this repository. Apple, iPhone and Mac are trademarks of Apple Inc. ciderui-zola is not affiliated with Apple, and Apple does not endorse it.
