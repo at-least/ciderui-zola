@@ -37,17 +37,17 @@ search = "/search"
 bag = "/bag"
 
 [extra.footer]
-notes = '<p>Trade-in values vary. See <a href="/shop/trade-in/">example.com/shop/trade-in</a> for details.</p>'
+notes = '<p>Credit for a trade-in depends on the device. Details at <a href="/shop/trade-in/">example.com/shop/trade-in</a>.</p>'
 directory = [
   [
-    { id = "footer-shop", title = "Shop and Learn", links = [{ text = "Store", href = "/store/" }, { text = "Laptops", href = "/laptops/" }, { text = "Phones", href = "/phones/" }] },
+    { id = "footer-shop", title = "Products", links = [{ text = "Store", href = "/store/" }, { text = "Laptops", href = "/laptops/" }, { text = "Phones", href = "/phones/" }] },
     { id = "footer-wallet", title = "Payments", links = [{ text = "Wallet", href = "/wallet/" }, { text = "Cider Card", href = "/cider-card/" }] },
   ],
   [
-    { id = "footer-account", title = "Account", links = [{ text = "Manage Your Account", href = "/account/" }, { text = "Store Account", href = "/shop/account/" }] },
+    { id = "footer-account", title = "Account", links = [{ text = "Your Account", href = "/account/" }, { text = "Order History", href = "/shop/account/" }] },
   ],
 ]
-shop = 'More ways to shop: <a href="/retail/">Find a store</a> near you.'
+shop = 'Want to see it first? <a href="/retail/">Visit a store</a> near you.'
 copyright = "Copyright © 2026 Example Inc. All rights reserved."
 links = [
   { text = "Privacy Policy", href = "/privacy/" },

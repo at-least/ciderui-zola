@@ -117,9 +117,9 @@
 // the global nav's search's suggestions (its flyout, search_flyout, and
 // base.html's template cz-suggestions, ciderui's sections): once two
 // characters are typed, in the quick links' place, the pages whose title
-// holds what was typed (Suggested Links, those starting with it first) and
+// holds what was typed (Pages, those starting with it first) and
 // the words of the pages' titles and descriptions its last word starts
-// (Suggested Searches, each sent to the search page as q, the words the most
+// (Searches, each sent to the search page as q, the words the most
 // pages use first), five of each as apple.com's, what was typed marked; with
 // fewer, or the field cleared, the quick links again (apple.com's clear
 // button leaves its suggestions until something is typed: its script

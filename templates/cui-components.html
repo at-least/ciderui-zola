@@ -107,7 +107,7 @@
 <button class="cui-globalnav-searchreset" type="reset" aria-label="Clear search">{{ <cui_icon name="clear" class="cui-globalnav-image" /> }}{{ <cui_icon name="clear_compact" class="cui-globalnav-image-compact" /> }}</button>
 </form>
 {%- if search_links %}
-<h2 class="cui-globalnav-searchheading" id="cui-globalnav-searchheading">Quick Links</h2>
+<h2 class="cui-globalnav-searchheading" id="cui-globalnav-searchheading">Shortcuts</h2>
 <ul class="cui-globalnav-searchlinks" aria-labelledby="cui-globalnav-searchheading">
 {%- for link in search_links %}
 <li><a class="cui-globalnav-searchlink" href="{{ link.href }}">{{ <cui_icon name="arrow" class="cui-globalnav-image" /> }}{{ <cui_icon name="arrow_compact" class="cui-globalnav-image-compact" /> }}{{ link.text }}</a></li>

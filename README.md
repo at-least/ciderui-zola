@@ -36,7 +36,7 @@ The settings under `[extra]` (`theme.toml` lists them with their defaults):
 | `search_flyout` | `true`: the nav's search a button opening the search over the page, which sends what is typed to `search` as `q`, and suggests, as two characters or more are typed, the pages whose title holds them and the words they start, from Zola's search index (`false`, the default: a link to it) |
 | `search_links` | the search's quick links, `[{ text, href }]`; `[]` for none |
 | `bag_flyout` | `true`: the nav's bag a button opening the bag over the page, an empty bag's, as ciderui's (`false`, the default: a link to `bag`) |
-| `bag_message` | the bag's message, `"Your Bag is empty."`; required with `bag_flyout` |
+| `bag_message` | the bag's message, `"Nothing here yet."`; required with `bag_flyout` |
 | `bag_line` | a line under it, `{ text, href, rest }`: a link, then the rest of its sentence (`{ text = "Sign in", href = "/signin/", rest = " to see if you have any saved items" }`); `{}` for none |
 | `bag_heading`, `bag_links` | its links under their heading, `[{ icon, text, href }]`, the icon one of ciderui's: `orders`, `saves`, `account`, `sign_in`; `[]` for none |
 | `footer` | `{ copyright, links?, directory?, notes?, shop?, locale? }`, ciderui's footer: `links` `[{ text, href }]`; `directory` columns of sections `[[{ id, title, links }]]`; `notes` and `shop` HTML; `locale` `{ text, href }`; `{}` for no footer |

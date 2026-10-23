@@ -186,21 +186,21 @@ await page.waitForTimeout(400);
 await page.evaluate(() => { window.czMoved = 0; new MutationObserver((records) => { window.czMoved += records.length; }).observe(document.querySelector('.cui-globalnav-searchpanel'), { childList: true }); });
 r = await typed('p');
 const kept = await page.evaluate(() => window.czMoved === 0);
-check('one character typed: the quick links, their rows where they were (put back, they would fade in again)', JSON.stringify(r.headings) === '["Quick Links"]' && JSON.stringify(r.sections) === '[[["/about/",null,"About"]]]' && r.status === '' && fetched === 0 && kept, { ...r, fetched, kept });
-r = await typed('l', '2 Suggested Links and 1 Suggested Searches available');
+check('one character typed: the quick links, their rows where they were (put back, they would fade in again)', JSON.stringify(r.headings) === '["Shortcuts"]' && JSON.stringify(r.sections) === '[[["/about/",null,"About"]]]' && r.status === '' && fetched === 0 && kept, { ...r, fetched, kept });
+r = await typed('l', '2 Pages and 1 Searches available');
 check('two: the pages whose title holds them, those starting with them first, and the words they start, what was typed marked; a status line saying so',
-  JSON.stringify(r.headings) === '["Suggested Links","Suggested Searches"]'
+  JSON.stringify(r.headings) === '["Pages","Searches"]'
   && JSON.stringify(r.sections) === JSON.stringify([[['/plum/', 'Pl', 'Plum'], ['/a-plum-cake/', 'Pl', 'A Plum Cake']], [['/search/?q=plum', 'pl', 'plum']]]), r);
 check('its rows ciderui\'s (globalnav/suggestions.html: a link\'s arrow, a search\'s magnifier), each list named by its heading', r.shapes.length === 2 && r.shapes.every(Boolean) && r.named, r);
 check('muted, what was typed in the rows\' color (ciderui\'s, while a row marks it)', JSON.stringify(r.color) === '["rgb(110, 110, 115)","rgb(51, 51, 54)"]', r);
 await page.keyboard.press('Backspace');
 await page.waitForTimeout(100);
 r = await suggestions();
-check('back to one: the quick links again, the status line saying so, as apple.com\'s', JSON.stringify(r.headings) === '["Quick Links"]' && r.status === '1 Quick Links available', r);
+check('back to one: the quick links again, the status line saying so, as apple.com\'s', JSON.stringify(r.headings) === '["Shortcuts"]' && r.status === '1 Shortcuts available', r);
 r = await typed('lx', 'No suggestions');
 check('none found: no sections, the status line saying so', r.headings.length === 0, r);
 await page.fill('.cui-globalnav-searchinput', '');
-r = await typed('a plum c', '1 Suggested Links and 3 Suggested Searches available');
+r = await typed('a plum c', '1 Pages and 3 Searches available');
 check('more than one word: the titles holding them all, and the words the last starts after the others', JSON.stringify(r.sections[0]) === JSON.stringify([['/a-plum-cake/', 'A Plum C', 'A Plum Cake']]) && r.sections[1].some((s) => JSON.stringify(s) === JSON.stringify(['/search/?q=a+plum+cake', 'a plum c', 'a plum cake'])), r);
 await page.fill('.cui-globalnav-searchinput', '');
 r = await typed('se', null);
@@ -208,7 +208,7 @@ check('the search page is not a suggested link', r.sections.length > 0 && !r.sec
 await page.click('.cui-globalnav-searchreset');
 await page.waitForTimeout(100);
 r = await suggestions();
-check('its clear button: the field empty, the quick links again', r.value === '' && JSON.stringify(r.headings) === '["Quick Links"]' && r.status === '1 Quick Links available', r);
+check('its clear button: the field empty, the quick links again', r.value === '' && JSON.stringify(r.headings) === '["Shortcuts"]' && r.status === '1 Shortcuts available', r);
 await page.focus('.cui-globalnav-searchinput');
 r = await typed('st', null);
 check('five of each at most, as apple.com\'s (seven stories start with it)', r.sections[0].length === 5 && r.sections[0].every(([href]) => href.startsWith('/news/story-')) && r.sections.every((rows) => rows.length <= 5), r);
