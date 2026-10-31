@@ -22,12 +22,12 @@ const FONTS = join(ROOT, 'node_modules/ciderui/fonts');
 const ICONS = join(ROOT, 'node_modules/ciderui/rust/src/icon.rs');
 
 // cui_icon(name, class=""): the crate's Icon::write, as Tera: an <svg> with
-// its class, aria-hidden, its box and what is drawn in it
+// its class, aria-hidden, its box, its paint and what is drawn in it
 function icons() {
-  const found = [...readFileSync(ICONS, 'utf8').matchAll(/pub const ([A-Z_]+): Icon = Icon \{\s*width: "([^"]+)",\s*height: "([^"]+)",\s*view_box: "([^"]+)",\s*inner: r#"(.*?)"#,\s*\};/gs)];
+  const found = [...readFileSync(ICONS, 'utf8').matchAll(/pub const ([A-Z_]+): Icon = Icon \{\s*width: "([^"]+)",\s*height: "([^"]+)",\s*view_box: "([^"]+)",\s*paint: "([^"]*)",\s*inner: r#"(.*?)"#,\s*\};/gs)];
   if (!found.length) throw new Error(`no icons in ${ICONS}`);
-  const branches = found.map(([, name, width, height, viewBox, inner], i) =>
-    `{%- ${i ? 'elif' : 'if'} name == "${name.toLowerCase()}" -%}\n<svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="${width}" height="${height}" viewBox="${viewBox}">${inner}</svg>`);
+  const branches = found.map(([, name, width, height, viewBox, paint, inner], i) =>
+    `{%- ${i ? 'elif' : 'if'} name == "${name.toLowerCase()}" -%}\n<svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="${width}" height="${height}" viewBox="${viewBox}"${paint ? ` ${paint}` : ''}>${inner}</svg>`);
   // the names, in lines of 70 characters at most
   const lines = [''];
   for (const [, name] of found) {
