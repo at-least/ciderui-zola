@@ -9,10 +9,10 @@
 // order (the markup check holds the two to the same markup), and its box
 // and its computed styles must be the same, lengths within 1/32px.
 
-import { readFileSync, readdirSync, rmSync } from 'node:fs';
+import { readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { chromium } from 'playwright-chromium';
-import { CIDERUI, ROOT, zolaBuild } from './lib.mjs';
+import { CIDERUI, ROOT, example, zolaBuild } from './lib.mjs';
 import { CASES, parityFiles } from './markup.mjs';
 
 const WIDTHS = [1600, 1069, 1068, 735, 734, 390];
@@ -42,9 +42,9 @@ const same = (a, b) => {
 };
 
 // ciderui's stylesheet as its checks compile it
-const { compile } = await import(join(CIDERUI, 'test/compile.mjs'));
+const { COMPONENTS, compile } = await import(join(CIDERUI, 'test/compile.mjs'));
 const TYPES = [...readFileSync(join(CIDERUI, 'type.css'), 'utf8').matchAll(/@utility ([a-z-]+)/g)].map((m) => m[1]).join(' ');
-const components = readdirSync(join(CIDERUI, 'components')).map((c) => `@import "components/${c}/${c}.css";`).join('\n');
+const components = COMPONENTS.map((c) => `@import "${c.dir}/${c.name}.css";`).join('\n');
 const theirs = compile({ css: `@import "fonts.css";\n@import "index.css";\n${components}`, classes: TYPES });
 const ours = readFileSync(join(ROOT, 'static/ciderui-zola.css'), 'utf8');
 
@@ -81,7 +81,7 @@ const themeMarkup = await (async () => {
 let compared = 0;
 const failures = [];
 for (const [id] of CASES) {
-  served['ciderui.test'] = document(readFileSync(join(CIDERUI, 'components', id.replace('/', '/examples/') + '.html'), 'utf8'));
+  served['ciderui.test'] = document(example(id));
   served['theme.test'] = document(themeMarkup[id]);
   for (const width of WIDTHS) {
     await page.setViewportSize({ width, height: 900 });

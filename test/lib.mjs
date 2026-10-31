@@ -4,13 +4,21 @@
 // ciderui's places.
 
 import { execFileSync } from 'node:child_process';
-import { cpSync, mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const CIDERUI = join(ROOT, 'node_modules/ciderui');
+
+const { componentDir } = await import(join(CIDERUI, 'test/compile.mjs'));
+// one of ciderui's examples, its id <name>/<example>
+// (components/<set>/<name>/examples/<example>.html)
+export const example = (id) => {
+  const [name, file] = id.split('/');
+  return readFileSync(join(CIDERUI, componentDir(name), 'examples', `${file}.html`), 'utf8');
+};
 
 // site: a directory under test/; files: { path in the site: content };
 // returns { root, out }, the copy and its build, for the caller to remove

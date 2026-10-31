@@ -1,6 +1,6 @@
 /* ciderui-zola — the theme's stylesheet, built into static/ciderui-zola.css
  * by `npm run build`: Tailwind's preflight and theme, ciderui (its tokens,
- * base and type), every one of its components, and its type utilities,
+ * base and type), its site set (site.css), and its type utilities,
  * which Tailwind writes only for a class it finds: a site's markdown is not
  * scanned, so all of them are named here. The templates write ciderui's
  * classes and no utility, and are not scanned: a word in their comments
@@ -12,29 +12,5 @@
 
 @import "ciderui/fonts.css";
 @import "ciderui";
-@import "ciderui/components/accordion/accordion.css";
-@import "ciderui/components/article/article.css";
-@import "ciderui/components/button/button.css";
-@import "ciderui/components/card/card.css";
-@import "ciderui/components/checkbox/checkbox.css";
-@import "ciderui/components/field/field.css";
-@import "ciderui/components/footer/footer.css";
-@import "ciderui/components/footnote/footnote.css";
-@import "ciderui/components/gallery/gallery.css";
-@import "ciderui/components/globalnav/globalnav.css";
-@import "ciderui/components/link/link.css";
-@import "ciderui/components/localnav/localnav.css";
-@import "ciderui/components/modal/modal.css";
-@import "ciderui/components/option/option.css";
-@import "ciderui/components/posts/posts.css";
-@import "ciderui/components/price/price.css";
-@import "ciderui/components/productnav/productnav.css";
-@import "ciderui/components/quicklinks/quicklinks.css";
-@import "ciderui/components/ribbon/ribbon.css";
-@import "ciderui/components/section/section.css";
-@import "ciderui/components/shelf/shelf.css";
-@import "ciderui/components/stat/stat.css";
-@import "ciderui/components/stories/stories.css";
-@import "ciderui/components/swatch/swatch.css";
-@import "ciderui/components/tile/tile.css";
+@import "ciderui/site.css";
 @import "./zola.css";

@@ -23,9 +23,8 @@
 import { existsSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { extname, join } from 'node:path';
 import { chromium } from 'playwright-chromium';
-import { CIDERUI, zolaBuild } from './lib.mjs';
+import { example, zolaBuild } from './lib.mjs';
 
-const example = (id) => readFileSync(join(CIDERUI, 'components', id.replace('/', '/examples/') + '.html'), 'utf8');
 const config = readFileSync(new URL('./site/config.toml', import.meta.url), 'utf8');
 if (!config.includes('search = "/search"\n')) throw new Error('test/site/config.toml: no search = "/search" to make a flyout of');
 const MAC = '{ text = "Laptops", href = "/laptops" }';
@@ -149,7 +148,7 @@ check('no error on the search pages', errors.length === 0, errors);
 // the suggestions
 const order = JSON.parse(readFileSync(join(out, 'search_index.en.json'), 'utf8')).map((p) => new URL(p.url).pathname);
 if (!(order.indexOf('/a-plum-cake/') < order.indexOf('/plum/'))) throw new Error(`the index has Plum before A Plum Cake: ${order}`);
-const ciderui = readFileSync(join(CIDERUI, 'components/globalnav/examples/suggestions.html'), 'utf8').split('\n').map((l) => l.trim());
+const ciderui = example('globalnav/suggestions').split('\n').map((l) => l.trim());
 const exampleRows = ['href="/laptops"', 'href="/search?q=laptop"'].map((href) => ciderui.find((l) => l.includes(`class="cui-globalnav-searchlink" ${href}`)));
 let fetched = 0;
 page.on('request', (req) => { if (req.url().includes('search_index')) fetched++; });

@@ -1,5 +1,5 @@
 // node test/markup.mjs: the theme's components write ciderui's markup. Each
-// case is one of ciderui's examples (components/<name>/examples/<id>.html)
+// case is one of ciderui's examples (components/<set>/<name>/examples/<id>.html)
 // and the Tera that writes it through the theme's components, given the
 // example's own text; test/site is built with them on one page, each in a
 // <div data-example>, and each one's HTML must equal the example's, both
@@ -10,9 +10,8 @@
 import { readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { chromium } from 'playwright-chromium';
-import { CIDERUI, zolaBuild } from './lib.mjs';
+import { example, zolaBuild } from './lib.mjs';
 
-const example = (id) => readFileSync(join(CIDERUI, 'components', id.replace('/', '/examples/') + '.html'), 'utf8');
 const trimmed = (html) => html.split('\n').map((l) => l.trim()).join('');
 // a Tera string: backticks, which none of the examples' text holds
 const str = (s) => {
