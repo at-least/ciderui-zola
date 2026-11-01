@@ -55,3 +55,10 @@ links = [
   { text = "Site Map", href = "/sitemap/" },
 ]
 locale = { text = "United States", href = "/choose-country/" }
+
+# the docs layout's (docs.html, docs-section.html): its bar's and its
+# navigator's title, and its navigator's rows
+[extra.docs]
+title = "Documentation"
+pages = ["start.md", "reference/_index.md"]
+

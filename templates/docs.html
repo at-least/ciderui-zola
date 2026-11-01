@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{#- A documentation page (template = "docs.html"), in Apple's developer
+    documentation's layout, under the global nav: [extra.docs] title, the
+    documentation's name, its bar's and its navigator's, linking its first
+    page; pages, its navigator's rows (cz_docs_items). Its hero: the
+    sections above it as crumbs, its [extra] category (or Article) as its
+    eyebrow, its title and its description; its markdown, the content; See
+    Also, the other pages of its section in its category. -#}
+{% block title %}{{ page.title }} - {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description or config.description or "" }}{% endblock description %}
+{% block main -%}
+{%- set docs = config.extra.docs -%}
+{%- set first = get_page(path=docs.pages[0]) if docs.pages[0] is not matching(pat="_index[.]md$") else get_section(path=docs.pages[0]) -%}
+{%- set items %}{{ <cz_docs_items pages={docs.pages} current={page.path} /> }}{% endset -%}
+{%- set crumbs %}{{ <cz_docs_crumbs ancestors={page.ancestors} /> }}{% endset -%}
+{%- set related = [] -%}
+{%- if page.extra.category is defined and page.ancestors | length > 1 -%}
+{%- set parent = get_section(path=page.ancestors | last) -%}
+{%- set by_category = parent.pages | group_by(attribute="extra.category") -%}
+{%- set related = by_category[page.extra.category] -%}
+{%- endif -%}
+{% <cui_docs_page title={docs.title} href={first.permalink} navigator={load_data(literal=items, format="json")}> %}
+<div class="cui-docs-page-column">{{ <cui_docs_hero title={page.title} crumbs={load_data(literal=crumbs, format="json")} eyebrow={page.extra.category | default(value="Article")} abstract={page.description or ""} /> }}</div>
+<div class="cui-docs-page-column"><div class="cui-docs-content">{{ <cui_markdown html={page.content} /> }}</div></div>
+{%- if related | length > 1 %}
+{#- a comma before each topic after the first written, the page itself left out (it is in related once) -#}
+{%- set topics %}[{"heading": {{ page.extra.category | json_encode | safe }}, "topics": [{%- for p in related -%}{%- if p.path != page.path -%}{% if loop.index0 > 0 and not (loop.index0 == 1 and related[0].path == page.path) %},{% endif %}{"label": {{ p.title | json_encode | safe }}, "href": {{ p.permalink | json_encode | safe }}, "abstract": {{ p.description | default(value="") | json_encode | safe }}, "collection": false}{%- endif -%}{%- endfor -%}]}]{% endset %}
+<div class="cui-docs-page-column">{{ <cui_docs_topics title="See Also" groups={load_data(literal=topics, format="json")} /> }}</div>
+{%- endif %}
+{% </cui_docs_page> %}
+{%- endblock main %}

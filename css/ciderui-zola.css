@@ -1,6 +1,7 @@
 /* ciderui-zola — the theme's stylesheet, built into static/ciderui-zola.css
  * by `npm run build`: Tailwind's preflight and theme, ciderui (its tokens,
- * base and type), its site set (site.css), and its type utilities,
+ * base and type), its site set (site.css) and its docs set (docs.css, the
+ * docs layout's), and its type utilities,
  * which Tailwind writes only for a class it finds: a site's markdown is not
  * scanned, so all of them are named here. The templates write ciderui's
  * classes and no utility, and are not scanned: a word in their comments
@@ -13,4 +14,5 @@
 @import "ciderui/fonts.css";
 @import "ciderui";
 @import "ciderui/site.css";
+@import "ciderui/docs.css";
 @import "./zola.css";

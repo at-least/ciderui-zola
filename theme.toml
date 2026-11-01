@@ -39,6 +39,10 @@ homepage = ""
 # - head: tags for every page's <head>, after the theme's, [{ tag, attrs?,
 #   content? }].
 # - not_found: the 404 page's texts, { headline?, link? }.
+# - docs: the docs layout's (docs.html, docs-section.html), { title, pages }:
+#   the documentation's name on its bar and its navigator, linking its
+#   first page, and the content paths of its navigator's rows from the top
+#   (a section's with its pages under it); {} for a site with no docs page.
 [extra]
 logo = ""
 nav = []
@@ -54,3 +58,4 @@ bag_links = []
 footer = {}
 head = []
 not_found = {}
+docs = {}

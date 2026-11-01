@@ -34,6 +34,24 @@ const post = (href, category, datetime, date, headline) =>
   `<li>{{ <cui_post href="${href}" media=${str(img('cui-post-media'))} category="${category}" datetime="${datetime}" date="${date}" headline=${str(headline)} /> }}</li>`;
 
 
+// the docs examples' rows and topics (ciderui's docs-navigator, docs-topics
+// and docs-page examples)
+const row = (label, href, current = false, open = false, children = []) => ({ label, href, current, open, children });
+const NAVIGATOR = [
+  row('Getting started', '#getting-started'),
+  row('Crash reports', '#crash-reports', false, true, [{ group: 'Reports' }, row('Reading a crash report', '#reading', true), row('Symbolicating a backtrace', '#symbolicating')]),
+  row('Alerts', '#alerts', false, false, [row('Routing an alert', '#routing')]),
+];
+const PAGE_NAVIGATOR = [
+  row('Getting started', '#getting-started'),
+  row('Crash reports', '#crash-reports', false, true, [row('Reading a crash report', '#reading', true), row('Symbolicating a backtrace', '#symbolicating')]),
+];
+const TOPICS = [{ heading: 'Crash reports', topics: [
+  { label: 'Symbolicating a backtrace', href: '#symbolicating', abstract: 'Replace the addresses in a backtrace with the names of the functions they fall in.', collection: false },
+  { label: 'Identifying the cause of common crashes', href: '#common-crashes', abstract: 'Match a crash report to a pattern and find what to fix.', collection: false },
+  { label: 'Alerts', href: '#alerts', abstract: 'Hear about a new crash where your team already is.', collection: true },
+] }];
+
 export const CASES = [
   ['link/more', `{{ <cui_more_link href="#learn" text="Learn more" /> }}`],
   ['section/section', `{% <cui_section> %}<p>Content</p>{% </cui_section> %}`],
@@ -74,6 +92,13 @@ export const CASES = [
     post('/news/archive/', 'Update', '2026-10-16', 'October 16, 2026', "The archive's rows"),
     post('/news/fonts/', 'Update', '2026-10-15', 'October 15, 2026', 'Inter where SF is not'),
   ].join('')}{% </cui_posts> %}`],
+  // the docs set's: a list of rows or groups is JSON, its pages under a
+  // page a third dimension
+  ['docs-bar/bar', `{{ <cui_docs_bar title="Documentation" href="#documentation" navigator="docs-navigator" /> }}`],
+  ['docs-hero/hero', `{{ <cui_docs_hero title="Reading a crash report" crumbs={[{"label": "Crash reports", "href": "#crash-reports"}, {"label": "Diagnosing crashes", "href": "#diagnosing"}]} eyebrow="Article" abstract="Find the thread that crashed, the frame that failed and the images it had loaded." /> }}`],
+  ['docs-navigator/navigator', `{{ <cui_docs_navigator title="Crashes" href="#crashes" items={load_data(literal=${str(JSON.stringify(NAVIGATOR))}, format="json")} /> }}`],
+  ['docs-topics/topics', `{{ <cui_docs_topics title="See Also" groups={load_data(literal=${str(JSON.stringify(TOPICS))}, format="json")} /> }}`],
+  ['docs-page/page', `{% <cui_docs_page title="Crashes" href="#crashes" navigator={load_data(literal=${str(JSON.stringify(PAGE_NAVIGATOR))}, format="json")}> %}<div class="cui-docs-page-column">{{ <cui_docs_hero title="Reading a crash report" crumbs={[{"label": "Crash reports", "href": "#crash-reports"}]} eyebrow="Article" abstract="Find the thread that crashed, the frame that failed and the images it had loaded." /> }}</div><div class="cui-docs-page-column"><div class="cui-docs-content"><h2>Overview</h2><p>A crash report records what an app was doing when it stopped.</p></div></div><div class="cui-docs-page-column">{{ <cui_docs_topics title="See Also" groups={load_data(literal=${str(JSON.stringify([{ heading: '', topics: [TOPICS[0].topics[0]] }]))}, format="json")} /> }}</div>{% </cui_docs_page> %}`],
 ];
 
 const parity = CASES.map(([id, tera]) => `<div data-example="${id}">${tera}</div>`).join('\n');

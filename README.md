@@ -1,6 +1,6 @@
 # ciderui-zola
 
-A [Zola](https://www.getzola.org) theme in apple.com's look, built on [ciderui](../ciderui): a site's pages as the Newsroom's articles, its news as the Newsroom's index and archive, the global nav and the footer from its settings. ciderui's documentation (`ciderui/docs/`) is built with it. Why it is built as it is: [DESIGN.md](DESIGN.md).
+A [Zola](https://www.getzola.org) theme in apple.com's look, built on [ciderui](../ciderui): a site's pages as the Newsroom's articles, its documentation as Apple's developer documentation, its news as the Newsroom's index and archive, the global nav and the footer from its settings. ciderui's documentation (`ciderui/docs/`) is built with it. Why it is built as it is: [DESIGN.md](DESIGN.md).
 
 ## Use it
 
@@ -42,6 +42,7 @@ The settings under `[extra]` (`theme.toml` lists them with their defaults):
 | `footer` | `{ copyright, links?, directory?, notes?, shop?, locale? }`, ciderui's footer: `links` `[{ text, href }]`; `directory` columns of sections `[[{ id, title, links }]]`; `notes` and `shop` HTML; `locale` `{ text, href }`; `{}` for no footer |
 | `head` | tags for every page's `<head>`, `[{ tag, attrs?, content? }]` |
 | `not_found` | the 404 page's texts, `{ headline?, link? }` |
+| `docs` | the docs layout's (`docs.html`, `docs-section.html`), `{ title, pages }`: `title`, the documentation's name, on its bar and its navigator, linking its first page; `pages`, the content paths of its navigator's rows from the top (`["get-started.md", "components/_index.md"]`), a section's with its pages under it |
 
 A path in the site (`/news/`) goes through `get_url`, so it holds wherever the site is served.
 
@@ -56,6 +57,8 @@ A path in the site (`/news/`) goes through `get_url`, so it holds wherever the s
 | `news-page.html` | a story: an article with its category and date, then the section's newest three others; `[extra] related` ("More from" and the section's title) |
 | `archive.html` | a news section's archive, a subsection with `template = "archive.html"`: a month of rows each |
 | `search.html` | the site's search page, a page with `template = "search.html"` (`content/search.md`, and `search = "/search/"`): its field, and the pages holding each word of `?q=` as rows, found by the theme's script in Zola's search index |
+| `docs.html` | a documentation page (`template = "docs.html"`), in Apple's developer documentation's layout: the bar, the navigator (`[extra] docs`) beside it from 1024px or in a sheet the bar's button opens, the page's hero (the sections above it as crumbs, its `[extra] category` or Article over its title and description), its markdown, and See Also, the other pages of its section in its category |
+| `docs-section.html` | a documentation section (`template = "docs-section.html"`, `page_template = "docs.html"`), as `docs.html`, then Topics: its pages, grouped by their `[extra] category` in the order of its `[extra] categories = [...]`, each with its description |
 | `404.html` | a headline and a link home |
 
 A page's front matter: `description`, its subhead; `date`; `[extra] category`, its eyebrow; `[extra] image`, its picture in a story or a row (a path Zola resizes, in `static/` or `content/`); `[extra] dark = true`, the whole page dark (`cui-dark`). A section's `[extra.localnav]`, `{ links = [{ text, href }], button = { text, href } }`, gives it and its pages ciderui's local nav, titled with the section's title.

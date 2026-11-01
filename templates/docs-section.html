@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{#- A documentation section (template = "docs-section.html"), in Apple's
+    developer documentation's layout, as docs.html: its hero (the sections
+    above it, its title and its description), its markdown, then Topics,
+    its pages grouped by their [extra] category in the order of its [extra]
+    categories, each with its description. -#}
+{% block title %}{{ section.title }} - {{ config.title }}{% endblock title %}
+{% block description %}{{ section.description or config.description or "" }}{% endblock description %}
+{% block main -%}
+{%- set docs = config.extra.docs -%}
+{%- set first = get_page(path=docs.pages[0]) if docs.pages[0] is not matching(pat="_index[.]md$") else get_section(path=docs.pages[0]) -%}
+{%- set items %}{{ <cz_docs_items pages={docs.pages} current={section.path} /> }}{% endset -%}
+{%- set crumbs %}{{ <cz_docs_crumbs ancestors={section.ancestors} /> }}{% endset -%}
+{%- if section.extra.categories is not defined %}{{ throw(message="ciderui-zola: a docs section names its pages' groups in order, [extra] categories = [...]") }}{% endif -%}
+{%- set by_category = section.pages | group_by(attribute="extra.category") -%}
+{%- set topics %}[{%- for category in section.extra.categories -%}{"heading": {{ category | json_encode | safe }}, "topics": [{%- for p in by_category[category] -%}{"label": {{ p.title | json_encode | safe }}, "href": {{ p.permalink | json_encode | safe }}, "abstract": {{ p.description | default(value="") | json_encode | safe }}, "collection": false}{% if not loop.last %},{% endif %}{%- endfor -%}]}{% if not loop.last %},{% endif %}{%- endfor -%}]{% endset -%}
+{% <cui_docs_page title={docs.title} href={first.permalink} navigator={load_data(literal=items, format="json")}> %}
+<div class="cui-docs-page-column">{{ <cui_docs_hero title={section.title} crumbs={load_data(literal=crumbs, format="json")} abstract={section.description or ""} /> }}</div>
+<div class="cui-docs-page-column"><div class="cui-docs-content">{{ <cui_markdown html={section.content} /> }}</div></div>
+<div class="cui-docs-page-column">{{ <cui_docs_topics title="Topics" groups={load_data(literal=topics, format="json")} /> }}</div>
+{% </cui_docs_page> %}
+{%- endblock main %}

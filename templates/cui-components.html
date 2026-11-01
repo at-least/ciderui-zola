@@ -303,6 +303,122 @@
 </nav>
 {%- endcomponent cui_localnav %}
 
+{#- cui_docs_bar: Apple's developer documentation's bar, the button that
+    opens the navigator (navigator: its id, "" for no button) before the
+    documentation's title, a link home (the crate's DocsBar). -#}
+{% component cui_docs_bar(title, href, navigator="", class="") -%}
+{%- if not title %}{{ throw(message="ciderui-zola: cui_docs_bar needs a title") }}{% endif -%}
+<nav class="cui-docs-bar{% if class %} {{ class }}{% endif %}" aria-label="{{ title }}">
+{%- if navigator %}
+<button class="cui-docs-bar-toggle" type="button" popovertarget="{{ navigator }}" aria-label="Navigator">{{ <cui_icon name="docs_sidebar" /> }}</button>
+{%- endif %}
+<a class="cui-docs-bar-title" href="{{ href }}">{{ title }}</a>
+</nav>
+{%- endcomponent cui_docs_bar %}
+
+{#- cui_docs_hero: the top of a documentation page, its crumbs ([{ label,
+    href }], the pages above it, [] for none) ending with its title, its
+    eyebrow, its title and its abstract ("" for none) (the crate's
+    DocsHero). -#}
+{% component cui_docs_hero(title, crumbs=[], eyebrow="", abstract="", class="") -%}
+{%- if not title %}{{ throw(message="ciderui-zola: cui_docs_hero needs a title") }}{% endif -%}
+<header class="cui-docs-hero{% if class %} {{ class }}{% endif %}">
+{%- if crumbs %}
+<nav aria-label="Breadcrumbs">
+<ol class="cui-docs-hero-crumbs">
+{%- for c in crumbs %}
+<li><a href="{{ c.href }}">{{ c.label }}</a></li>
+{%- endfor %}
+<li aria-current="page">{{ title }}</li>
+</ol>
+</nav>
+{%- endif %}
+{%- if eyebrow %}
+<p class="cui-docs-hero-eyebrow">{{ eyebrow }}</p>
+{%- endif %}
+<h1 class="cui-docs-hero-title">{{ title }}</h1>
+{%- if abstract %}
+<p class="cui-docs-hero-abstract">{{ abstract }}</p>
+{%- endif %}
+</header>
+{%- endcomponent cui_docs_hero %}
+
+{#- cui_docs_navigator: the documentation's tree of pages, its title over
+    its rows (items: [{ group } or { label, href, current, open, children
+    }], children the same, two levels at most); a page with pages under it
+    opens and closes by its chevron, its checkbox named after its path's
+    words, as the crate names it (the crate's DocsNavigator). -#}
+{% component cui_docs_navigator(title, href, items, class="") -%}
+{%- if not title %}{{ throw(message="ciderui-zola: cui_docs_navigator needs a title") }}{% endif -%}
+<nav class="cui-docs-navigator{% if class %} {{ class }}{% endif %}" aria-label="Navigator">
+<a class="cui-docs-navigator-title" href="{{ href }}">{{ title }}</a>
+<ul class="cui-docs-navigator-list">
+{%- for item in items %}{{ <cz_docs_row item={item} level={1} /> }}{%- endfor %}
+</ul>
+</nav>
+{%- endcomponent cui_docs_navigator %}
+
+{#- cz_docs_row: a navigator's row (cui_docs_navigator's item) at its
+    level, and the rows under it, a level further in. -#}
+{% component cz_docs_row(item, level) -%}
+{%- if item.group is defined %}
+<li class="cui-docs-navigator-group">{{ item.group }}</li>
+{%- else %}
+{%- if not item.label %}{{ throw(message="ciderui-zola: a navigator's page needs a label") }}{% endif -%}
+{%- set children = item.children | default(value=[]) -%}
+{%- if item.open and not children %}{{ throw(message="ciderui-zola: " ~ item.label ~ " is open with no pages under it") }}{% endif -%}
+{%- if children and level > 1 %}{{ throw(message="ciderui-zola: the navigator holds two levels: " ~ item.label ~ " has pages under it") }}{% endif -%}
+{%- set id = "docs-navigator-" ~ (item.href | regex_replace(pattern=`^[a-z]+://[^/]*`, rep=``) | regex_replace(pattern=`[^A-Za-z0-9]+`, rep=`-`) | regex_replace(pattern=`^-+|-+$`, rep=``) | lower) %}
+<li class="cui-docs-navigator-item">
+{%- if children %}
+<input class="cui-docs-navigator-toggle" type="checkbox" id="{{ id }}" aria-label="{{ item.label }}"{% if item.open %} checked{% endif %}>
+{%- endif %}
+<div class="cui-docs-navigator-row">{% if children %}<label class="cui-docs-navigator-chevron" for="{{ id }}">{{ <cui_icon name="docs_chevron" /> }}</label>{% endif %}{{ <cui_icon name={"docs_collection" if children else "docs_article"} class="cui-docs-navigator-icon" /> }}<a class="cui-docs-navigator-link" href="{{ item.href }}"{% if item.current %} aria-current="page"{% endif %}>{{ item.label }}</a></div>
+{%- if children %}
+<ul class="cui-docs-navigator-list">
+{%- for child in children %}{{ <cz_docs_row item={child} level={level + 1} /> }}{%- endfor %}
+</ul>
+{%- endif %}
+</li>
+{%- endif %}
+{%- endcomponent cz_docs_row %}
+
+{#- cui_docs_topics: Topics or See Also, its title over its groups ([{
+    heading, topics: [{ label, href, abstract, collection }] }], a heading
+    "" for none) (the crate's DocsTopics). -#}
+{% component cui_docs_topics(title, groups, class="") -%}
+{%- if not title %}{{ throw(message="ciderui-zola: cui_docs_topics needs a title") }}{% endif -%}
+<section class="cui-docs-topics{% if class %} {{ class }}{% endif %}">
+<h2 class="cui-docs-topics-title">{{ title }}</h2>
+{%- for g in groups %}
+<div class="cui-docs-topics-group">
+{%- if g.heading %}
+<h3 class="cui-docs-topics-heading">{{ g.heading }}</h3>
+{%- endif %}
+{%- for t in g.topics %}
+{%- if not t.label %}{{ throw(message="ciderui-zola: a topic needs a label") }}{% endif %}
+<div class="cui-docs-topics-item"><a class="cui-docs-topics-link" href="{{ t.href }}">{{ <cui_icon name={"docs_collection" if t.collection else "docs_article"} class="cui-docs-topics-icon" /> }}<span>{{ t.label }}</span></a>{% if t.abstract %}<p class="cui-docs-topics-abstract">{{ t.abstract }}</p>{% endif %}</div>
+{%- endfor %}
+</div>
+{%- endfor %}
+</section>
+{%- endcomponent cui_docs_topics %}
+
+{#- cui_docs_page: a documentation page: its bar, its navigator (its rows,
+    cui_docs_navigator's items) in its sheet, and its <main> (body: its
+    columns, each a cui-docs-page-column holding a hero, the content or
+    the topics) (the crate's DocsPage). -#}
+{% component cui_docs_page(title, href, navigator, class="") -%}
+<div class="cui-docs-page{% if class %} {{ class }}{% endif %}">
+{{ <cui_docs_bar title={title} href={href} navigator="docs-navigator" /> }}
+<div class="cui-docs-page-sidebar" id="docs-navigator" popover>
+<button class="cui-docs-page-close" type="button" popovertarget="docs-navigator" popovertargetaction="hide" aria-label="Close Navigator">{{ <cui_icon name="docs_close" /> }}</button>
+{{ <cui_docs_navigator title={title} href={href} items={navigator} /> }}
+</div>
+<main class="cui-docs-page-main">{{ body | safe }}</main>
+</div>
+{%- endcomponent cui_docs_page %}
+
 {#- cui_head: a site's own tags for every page's <head>, after the theme's
     ([{ tag, attrs?, content? }], content the element's inner HTML); an
     href or src that is a path in the site goes through get_url. base,
@@ -340,6 +456,42 @@
 <img class="{{ class }}" src="{{ image.url }}" alt="" width="{{ image.width }}" height="{{ image.height }}">
 {%- endif -%}
 {%- endcomponent cui_page_media %}
+
+{#- cz_docs_items: a docs page's navigator rows (cui_docs_navigator's
+    items) as JSON for load_data, from pages ([extra.docs] pages), the
+    content paths of its rows from the top: a page's row, or a section's with its
+    pages under it, grouped by their [extra] category in the order of the
+    section's [extra] categories; current, the shown page's or section's
+    path, marks its row and opens its section. -#}
+{% component cz_docs_items(pages, current) -%}
+[{%- for path in pages -%}
+{%- if path is matching(pat="_index[.]md$") -%}
+{%- set s = get_section(path=path) -%}
+{%- if s.extra.categories is not defined %}{{ throw(message="ciderui-zola: " ~ path ~ " is a section of the docs navigator: it names its pages' groups in order, [extra] categories = [...]") }}{% endif -%}
+{%- set by_category = s.pages | group_by(attribute="extra.category") -%}
+{"label": {{ s.title | json_encode | safe }}, "href": {{ s.permalink | json_encode | safe }}, "current": {{ s.path == current }}, "open": {{ current is matching(pat="^" ~ s.path) }}, "children": [
+{%- for category in s.extra.categories -%}
+{"group": {{ category | json_encode | safe }}}
+{%- for p in by_category[category] -%}, {"label": {{ p.title | json_encode | safe }}, "href": {{ p.permalink | json_encode | safe }}, "current": {{ p.path == current }}}{%- endfor -%}
+{% if not loop.last %},{% endif %}
+{%- endfor -%}]}
+{%- else -%}
+{%- set p = get_page(path=path) -%}
+{"label": {{ p.title | json_encode | safe }}, "href": {{ p.permalink | json_encode | safe }}, "current": {{ p.path == current }}}
+{%- endif -%}{% if not loop.last %},{% endif %}
+{%- endfor -%}]
+{%- endcomponent cz_docs_items %}
+
+{#- cz_docs_crumbs: a docs page's crumbs (cui_docs_hero's) as JSON for
+    load_data: the sections above it, the site's root left out. -#}
+{% component cz_docs_crumbs(ancestors) -%}
+[{%- for path in ancestors -%}
+{%- if not loop.first -%}
+{%- set s = get_section(path=path) -%}
+{% if loop.index0 > 1 %},{% endif %}{"label": {{ s.title | json_encode | safe }}, "href": {{ s.permalink | json_encode | safe }}}
+{%- endif -%}
+{%- endfor -%}]
+{%- endcomponent cz_docs_crumbs %}
 
 {#- cz_href: an href as JSON, a path in the site (/privacy/) through
     get_url, so it holds under base_url wherever the site is served, its

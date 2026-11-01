@@ -1,8 +1,8 @@
 {#- The page around every template: its head (the theme's stylesheet,
     Inter's latin face preloaded, the script, a site's own tags), the
     global nav and the footer from [extra], the page's content between
-    them; dark (cui-dark on <html>) when its front matter's [extra] says
-    so. The markdown the theme reads (cui-markdown.html) needs these
+    them, in its <main> (block main: a docs page writes its own); dark
+    (cui-dark on <html>) when its front matter's [extra] says so. The markdown the theme reads (cui-markdown.html) needs these
     [markdown] settings: a site without them fails here. -#}
 {%- if not config.markdown.bottom_footnotes -%}
 {{ throw(message=`ciderui-zola: set bottom_footnotes = true under [markdown]: an article's footnotes are collected at its end, as the Newsroom's are`) }}
@@ -48,9 +48,11 @@
     <template class="cz-suggestions" data-index="{{ get_url(path='search_index.' ~ lang ~ '.json') }}"><h2 class="cui-globalnav-searchheading" id="cz-suggested-links">Pages</h2><ul class="cui-globalnav-searchlinks" aria-labelledby="cz-suggested-links"><li><a class="cui-globalnav-searchlink" href="">{{ <cui_icon name="arrow" class="cui-globalnav-image" /> }}{{ <cui_icon name="arrow_compact" class="cui-globalnav-image-compact" /> }}<span><mark></mark></span></a></li></ul><h2 class="cui-globalnav-searchheading" id="cz-suggested-searches">Searches</h2><ul class="cui-globalnav-searchlinks" aria-labelledby="cz-suggested-searches"><li><a class="cui-globalnav-searchlink" href="">{{ <cui_icon name="suggestion" class="cui-globalnav-image" /> }}{{ <cui_icon name="suggestion_compact" class="cui-globalnav-image-compact" /> }}<span><mark></mark></span></a></li></ul></template>
     {%- endif %}
     {%- endif %}
+    {% block main -%}
     <main id="main" class="cz-main">
       {% block content %}{% endblock content %}
     </main>
+    {%- endblock main %}
     {%- if extra.footer %}
     {%- set f = extra.footer %}
     {%- set links %}{{ <cz_links links={f.links | default(value=[])} /> }}{% endset %}
