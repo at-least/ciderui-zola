@@ -94,6 +94,8 @@ export const CASES = [
   ].join('')}{% </cui_posts> %}`],
   // the docs set's: a list of rows or groups is JSON, its pages under a
   // page a third dimension
+  // an alert as Zola writes it (github_alerts), on a docs page
+  ['docs-aside/note', `{{ <cui_markdown html=${str('<blockquote class="markdown-alert-note">\n<p>A report from a beta build carries its beta identifier; one from the App Store does not.</p>\n</blockquote>')} docs={true} /> }}`],
   ['docs-bar/bar', `{{ <cui_docs_bar title="Documentation" href="#documentation" navigator="docs-navigator" /> }}`],
   ['docs-hero/hero', `{{ <cui_docs_hero title="Reading a crash report" crumbs={[{"label": "Crash reports", "href": "#crash-reports"}, {"label": "Diagnosing crashes", "href": "#diagnosing"}]} eyebrow="Article" abstract="Find the thread that crashed, the frame that failed and the images it had loaded." /> }}`],
   ['docs-navigator/navigator', `{{ <cui_docs_navigator title="Crashes" href="#crashes" items={load_data(literal=${str(JSON.stringify(NAVIGATOR))}, format="json")} /> }}`],

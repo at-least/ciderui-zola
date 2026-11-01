@@ -8,6 +8,9 @@ category = "Controls"
 
 A button is a class on a link or a button.
 
+> [!TIP]
+> A link that looks like a button is still a link.
+
 ## Its sizes
 
 | size | height |

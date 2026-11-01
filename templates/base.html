@@ -10,8 +10,8 @@
 {%- if config.markdown.insert_anchor_links != "none" -%}
 {{ throw(message=`ciderui-zola: set insert_anchor_links = "none" under [markdown]: apple.com's headings have no anchor link`) }}
 {%- endif -%}
-{%- if config.markdown.github_alerts -%}
-{{ throw(message=`ciderui-zola: set github_alerts = false under [markdown]: ciderui has no alert`) }}
+{%- if not config.markdown.github_alerts -%}
+{{ throw(message=`ciderui-zola: set github_alerts = true under [markdown]: a docs page's alerts (> [!NOTE]) are DocC's asides`) }}
 {%- endif -%}
 {%- if config.markdown.highlighting.style != "inline" -%}
 {{ throw(message=`ciderui-zola: set style = "inline" under [markdown.highlighting]: a code block's tokens keep Giallo's light-dark() colors, which follow a block's scheme`) }}

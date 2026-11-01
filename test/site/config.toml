@@ -16,7 +16,7 @@ include_description = true
 [markdown]
 bottom_footnotes = true
 insert_anchor_links = "none"
-github_alerts = false
+github_alerts = true
 
 [markdown.highlighting]
 style = "inline"

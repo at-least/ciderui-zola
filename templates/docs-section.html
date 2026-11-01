@@ -17,7 +17,7 @@
 {%- set topics %}[{%- for category in section.extra.categories -%}{"heading": {{ category | json_encode | safe }}, "topics": [{%- for p in by_category[category] -%}{"label": {{ p.title | json_encode | safe }}, "href": {{ p.permalink | json_encode | safe }}, "abstract": {{ p.description | default(value="") | json_encode | safe }}, "collection": false}{% if not loop.last %},{% endif %}{%- endfor -%}]}{% if not loop.last %},{% endif %}{%- endfor -%}]{% endset -%}
 {% <cui_docs_page title={docs.title} href={first.permalink} navigator={load_data(literal=items, format="json")}> %}
 <div class="cui-docs-page-column">{{ <cui_docs_hero title={section.title} crumbs={load_data(literal=crumbs, format="json")} abstract={section.description or ""} /> }}</div>
-<div class="cui-docs-page-column"><div class="cui-docs-content">{{ <cui_markdown html={section.content} /> }}</div></div>
+<div class="cui-docs-page-column"><div class="cui-docs-content">{{ <cui_markdown html={section.content} docs={true} /> }}</div></div>
 <div class="cui-docs-page-column">{{ <cui_docs_topics title="Topics" groups={load_data(literal=topics, format="json")} /> }}</div>
 {% </cui_docs_page> %}
 {%- endblock main %}
