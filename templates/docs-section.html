@@ -12,6 +12,7 @@
 {%- set items %}{{ <cz_docs_items pages={docs.pages} current={section.path} /> }}{% endset -%}
 {%- set crumbs %}{{ <cz_docs_crumbs ancestors={section.ancestors} /> }}{% endset -%}
 {%- if section.extra.categories is not defined %}{{ throw(message="ciderui-zola: a docs section names its pages' groups in order, [extra] categories = [...]") }}{% endif -%}
+{%- for p in section.pages %}{% if p.extra.category is not defined or p.extra.category not in section.extra.categories %}{{ throw(message="ciderui-zola: " ~ p.relative_path ~ "'s [extra] category is none of its section's [extra] categories: Topics would leave it out") }}{% endif %}{% endfor -%}
 {%- set by_category = section.pages | group_by(attribute="extra.category") -%}
 {%- set topics %}[{%- for category in section.extra.categories -%}{"heading": {{ category | json_encode | safe }}, "topics": [{%- for p in by_category[category] -%}{"label": {{ p.title | json_encode | safe }}, "href": {{ p.permalink | json_encode | safe }}, "abstract": {{ p.description | default(value="") | json_encode | safe }}, "collection": false}{% if not loop.last %},{% endif %}{%- endfor -%}]}{% if not loop.last %},{% endif %}{%- endfor -%}]{% endset -%}
 {% <cui_docs_page title={docs.title} href={first.permalink} navigator={load_data(literal=items, format="json")}> %}

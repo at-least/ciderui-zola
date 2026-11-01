@@ -468,6 +468,7 @@
 {%- if path is matching(pat="_index[.]md$") -%}
 {%- set s = get_section(path=path) -%}
 {%- if s.extra.categories is not defined %}{{ throw(message="ciderui-zola: " ~ path ~ " is a section of the docs navigator: it names its pages' groups in order, [extra] categories = [...]") }}{% endif -%}
+{%- for p in s.pages %}{% if p.extra.category is not defined or p.extra.category not in s.extra.categories %}{{ throw(message="ciderui-zola: " ~ p.relative_path ~ "'s [extra] category is none of " ~ path ~ "'s [extra] categories: the navigator would leave it out") }}{% endif %}{% endfor -%}
 {%- set by_category = s.pages | group_by(attribute="extra.category") -%}
 {"label": {{ s.title | json_encode | safe }}, "href": {{ s.permalink | json_encode | safe }}, "current": {{ s.path == current }}, "open": {{ current is matching(pat="^" ~ s.path) }}, "children": [
 {%- for category in s.extra.categories -%}
