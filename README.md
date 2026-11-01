@@ -75,7 +75,7 @@ include_description = true   # a page's description is searched too
 
 It matches each word of the query in a page's title, its description and its text, the pages with the most of them in their title first; without the script it shows its field alone.
 
-A page's markdown can call the theme's Tera components, named after the crate's (`templates/cui-components.html`): `{{ <cui_more_link href="/news/" text="Read more" /> }}`, `{% <cui_section variant="alt"> %}…{% </cui_section> %}`.
+A page's markdown can call the theme's Tera components, named after ciderui's Go types (`templates/cui-components.html`): `{{ <cui_more_link href="/news/" text="Read more" /> }}`, `{% <cui_section variant="alt"> %}…{% </cui_section> %}`.
 
 ## Develop it
 

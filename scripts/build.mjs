@@ -1,8 +1,8 @@
 // Build the theme's prebuilt assets from ciderui, the files a site serves
 // without Node: static/ciderui-zola.css and static/fonts/ (Inter, which
 // ciderui's fonts.css loads relative to the stylesheet); and
-// templates/cui-icons.html, ciderui's icons (its crate's rust/src/icon.rs)
-// as the Tera component the templates draw them with.
+// templates/cui-icons.html, ciderui's icons (its Go package icon,
+// go/icon/icon.go) as the Tera component the templates draw them with.
 //
 //   node scripts/build.mjs           write them
 //   node scripts/build.mjs --check   fail if the committed ones differ
@@ -19,26 +19,32 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const FONTS = join(ROOT, 'node_modules/ciderui/fonts');
-const ICONS = join(ROOT, 'node_modules/ciderui/rust/src/icon.rs');
+const ICONS = join(ROOT, 'node_modules/ciderui/go/icon/icon.go');
 
-// cui_icon(name, class=""): the crate's Icon::write, as Tera: an <svg> with
-// its class, aria-hidden, its box, its paint and what is drawn in it
+// cui_icon(name, class=""): icon.Icon's Class, as Tera: an <svg> with its
+// class, aria-hidden, its box, its paint and what is drawn in it. Its name
+// is the Go var's in snake case (SearchCompact, search_compact): the names
+// the theme's pages call, kept from before the Go port.
 function icons() {
-  const found = [...readFileSync(ICONS, 'utf8').matchAll(/pub const ([A-Z_]+): Icon = Icon \{\s*width: "([^"]+)",\s*height: "([^"]+)",\s*view_box: "([^"]+)",\s*paint: "([^"]*)",\s*inner: r#"(.*?)"#,\s*\};/gs)];
-  if (!found.length) throw new Error(`no icons in ${ICONS}`);
+  const source = readFileSync(ICONS, 'utf8');
+  const found = [...source.matchAll(/^var ([A-Za-z]+) = Icon\{width: "([^"]+)", height: "([^"]+)", viewBox: "([^"]+)", paint: `([^`]*)`, inner: `([^`]*)`\}$/gm)];
+  // a var this pattern misreads would drop its icon silently
+  const declared = source.match(/^var \w+ = Icon\{/gm) ?? [];
+  if (!found.length || found.length !== declared.length) throw new Error(`read ${found.length} of ${declared.length} icons in ${ICONS}`);
+  const snake = (name) => name.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
   const branches = found.map(([, name, width, height, viewBox, paint, inner], i) =>
-    `{%- ${i ? 'elif' : 'if'} name == "${name.toLowerCase()}" -%}\n<svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="${width}" height="${height}" viewBox="${viewBox}"${paint ? ` ${paint}` : ''}>${inner}</svg>`);
+    `{%- ${i ? 'elif' : 'if'} name == "${snake(name)}" -%}\n<svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="${width}" height="${height}" viewBox="${viewBox}"${paint ? ` ${paint}` : ''}>${inner}</svg>`);
   // the names, in lines of 70 characters at most
   const lines = [''];
   for (const [, name] of found) {
-    const n = name.toLowerCase();
+    const n = snake(name);
     if (lines.at(-1) && lines.at(-1).length + n.length + 2 > 70) lines.push('');
     lines[lines.length - 1] += lines.at(-1) ? `, ${n}` : n;
   }
-  return `{#- cui_icon: one of ciderui's icons by its name in the crate, in small
-    letters, with class on its <svg>:
+  return `{#- cui_icon: one of ciderui's icons by its Go name (package icon) in
+    snake case, with class on its <svg>:
     ${lines.join(',\n    ')}.
-    Written by scripts/build.mjs from ciderui's rust/src/icon.rs: not edited
+    Written by scripts/build.mjs from ciderui's go/icon/icon.go: not edited
     by hand. -#}
 {% component cui_icon(name, class="") -%}
 ${branches.join('\n')}

@@ -1,5 +1,5 @@
-{#- cui_icon: one of ciderui's icons by its name in the crate, in small
-    letters, with class on its <svg>:
+{#- cui_icon: one of ciderui's icons by its Go name (package icon) in
+    snake case, with class on its <svg>:
     more, search, search_compact, bag, bag_compact, searchfield,
     searchfield_compact, arrow, arrow_compact, suggestion,
     suggestion_compact, clear, clear_compact, menu, flyout, flyout_compact,
@@ -8,7 +8,7 @@
     orders_compact, saves, saves_compact, account, account_compact,
     sign_in, sign_in_compact, docs_sidebar, docs_chevron, docs_article,
     docs_collection, docs_close, docs_copy, docs_copied, docs_filter.
-    Written by scripts/build.mjs from ciderui's rust/src/icon.rs: not edited
+    Written by scripts/build.mjs from ciderui's go/icon/icon.go: not edited
     by hand. -#}
 {% component cui_icon(name, class="") -%}
 {%- if name == "more" -%}

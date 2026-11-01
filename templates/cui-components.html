@@ -1,12 +1,12 @@
 {#- ciderui's components as Tera components, each writing the markup its
-    crate's component writes (ciderui/rust/src/), with the same fields as
+    Go type writes (ciderui's go/site and go/docs), with the same fields as
     parameters; test/markup.mjs holds each to ciderui's examples. A field
-    the crate leaves out with "" is "" here; one it requires throws when
-    empty, as the crate panics. Markup a page gives (a logo, a picture, a
+    the Go type leaves out with "" is "" here; one it requires throws when
+    empty, as the Go type panics. Markup a page gives (a logo, a picture, a
     body) is HTML, written as it is. -#}
 
 {#- cui_more_link: `cui-link`'s more link, its text and the chevron
-    after it (the crate's MoreLink). -#}
+    after it (site.MoreLink). -#}
 {% component cui_more_link(href, text, class="") -%}
 {%- if not href %}{{ throw(message="ciderui-zola: cui_more_link needs an href") }}{% endif -%}
 {%- if not text %}{{ throw(message="ciderui-zola: cui_more_link needs a text") }}{% endif -%}
@@ -14,7 +14,7 @@
 {%- endcomponent cui_more_link %}
 
 {#- cui_section: a band of the page, its ground (variant="alt"), its
-    rhythm (size="lg"), dark, its content (the crate's Section). -#}
+    rhythm (size="lg"), dark, its content (site.Section). -#}
 {% component cui_section(variant="", size="", dark=false, class="") -%}
 {%- if variant not in ["", "alt"] %}{{ throw(message="ciderui-zola: a cui_section's variant is \"alt\" or left out, not " ~ variant) }}{% endif -%}
 {%- if size not in ["", "lg"] %}{{ throw(message="ciderui-zola: a cui_section's size is \"lg\" or left out, not " ~ size) }}{% endif -%}
@@ -26,18 +26,18 @@
 {#- cui_globalnav: the bar across the top of the page, the site's logo
     (HTML: an <svg> in currentColor), its links ([{ text, href, flyout? }],
     a link's flyout its groups, [{ heading, large?, links? }], its large
-    links first, each [{ text, href }]: the crate's NavLink, FlyoutGroup),
+    links first, each [{ text, href }]: site.NavLink, site.FlyoutGroup),
     its search and bag pages if it has them ("" if not), dark, clear over a
-    hero (the crate's GlobalNav); search_flyout, its search a button
+    hero (site.GlobalNav); search_flyout, its search a button
     opening the search over the page, sending q to the search page, its
-    quick links search_links ([{ text, href }], [] for none) (the crate's
-    Search::Flyout; else Search::Link); bag_flyout, its bag a button opening
+    quick links search_links ([{ text, href }], [] for none)
+    (site.FlyoutSearch; else site.LinkedSearch); bag_flyout, its bag a button opening
     the bag over the page, an empty bag's: its message bag_message, a line
     under it bag_line ({ text, href, rest }: a link, then the rest of its
     sentence; {} for none), and its links bag_links ([{ icon, text, href }],
-    the icon one of the crate's by its name, orders, saves, account or
-    sign_in; [] for none) under their heading bag_heading (the crate's
-    Bag::Flyout, BagLink; else Bag::Link). -#}
+    the icon one of cui_icon's by its name, orders, saves, account or
+    sign_in; [] for none) under their heading bag_heading (site.FlyoutBag,
+    site.BagLink; else site.LinkedBag). -#}
 {% component cui_globalnav(logo, home, name, links, search="", bag="", dark=false, clear=false, search_flyout=false, search_links=[], bag_flyout=false, bag_message="", bag_line={}, bag_heading="", bag_links=[], class="") -%}
 {%- if not home %}{{ throw(message="ciderui-zola: cui_globalnav needs a home") }}{% endif -%}
 {%- if not name %}{{ throw(message="ciderui-zola: cui_globalnav needs a name") }}{% endif -%}
@@ -147,8 +147,8 @@
 {#- cui_footer: the footer, its notes (HTML, "" for none), its directory
     ([[{ id, title, links: [{ text, href }] }]], columns of sections, []
     for none), its shop line (HTML, "" for none), its copyright, its legal
-    links ([{ text, href }]), its locale ({ text, href }, {} for none) (the
-    crate's Footer and FooterSection). -#}
+    links ([{ text, href }]), its locale ({ text, href }, {} for none) (site.Footer
+    and site.FooterSection). -#}
 {% component cui_footer(copyright, notes="", directory=[], shop="", links=[], locale={}, class="") -%}
 {%- if not copyright %}{{ throw(message="ciderui-zola: cui_footer needs a copyright") }}{% endif -%}
 <footer class="cui-footer{% if class %} {{ class }}{% endif %}">
@@ -198,7 +198,7 @@
 
 {#- cui_article: a Newsroom story, its header (its category, its date,
     the headline, a subhead) over its copy (the body: HTML, as markdown
-    renders it) (the crate's Article). -#}
+    renders it) (site.Article). -#}
 {% component cui_article(headline, category="", datetime="", date="", subhead="", class="") -%}
 {%- if not headline %}{{ throw(message="ciderui-zola: cui_article needs a headline") }}{% endif -%}
 {%- if date and not datetime %}{{ throw(message="ciderui-zola: a cui_article's date needs its datetime") }}{% endif -%}
@@ -217,7 +217,7 @@
 {%- endcomponent cui_article %}
 
 {#- cui_stories: the Newsroom index's band, its heading over its grid of
-    stories (body: the <li>s, each a cui_story) (the crate's Stories). -#}
+    stories (body: the <li>s, each a cui_story) (site.Stories). -#}
 {% component cui_stories(heading, class="") -%}
 {%- if not heading %}{{ throw(message="ciderui-zola: cui_stories needs a heading") }}{% endif -%}
 <section class="cui-stories{% if class %} {{ class }}{% endif %}">
@@ -230,7 +230,7 @@
 
 {#- cui_story: a story, its picture (HTML: an <img class="cui-story-media">,
     "" for none), its category, its date, its headline; size "md" (two
-    across), "lg" (one across) or "" (three across) (the crate's Story). -#}
+    across), "lg" (one across) or "" (three across) (site.Story). -#}
 {% component cui_story(href, headline, size="", media="", category="", datetime="", date="") -%}
 {%- if not href %}{{ throw(message="ciderui-zola: cui_story needs an href") }}{% endif -%}
 {%- if not headline %}{{ throw(message="ciderui-zola: cui_story needs a headline") }}{% endif -%}
@@ -241,7 +241,7 @@
 
 {#- cui_posts: the archive's month, or with size "sm" an article's related
     stories: its heading over ruled rows (body: the <li>s, each a
-    cui_post) (the crate's Posts). -#}
+    cui_post) (site.Posts). -#}
 {% component cui_posts(heading, size="", class="") -%}
 {%- if not heading %}{{ throw(message="ciderui-zola: cui_posts needs a heading") }}{% endif -%}
 {%- if size not in ["", "sm"] %}{{ throw(message="ciderui-zola: a cui_posts' size is \"sm\" or left out, not " ~ size) }}{% endif -%}
@@ -253,7 +253,7 @@
 
 {#- cui_field: a text field, its label the placeholder until it is focused
     or filled, its input's id, type (kind), name, autocomplete ("" for
-    none) and value ("" for none) (the crate's Field, in no error, enabled,
+    none) and value ("" for none) (site.Field, in no error, enabled,
     with no prefix). -#}
 {% component cui_field(id, kind, name, label, autocomplete="", value="", class="") -%}
 {%- if not id %}{{ throw(message="ciderui-zola: cui_field needs an id") }}{% endif -%}
@@ -262,8 +262,7 @@
 {%- endcomponent cui_field %}
 
 {#- cui_post: a row, its picture (HTML: an <img class="cui-post-media">,
-    "" for none), its category, its headline, its date (the crate's
-    Post). -#}
+    "" for none), its category, its headline, its date (site.Post). -#}
 {% component cui_post(href, headline, media="", category="", datetime="", date="") -%}
 {%- if not href %}{{ throw(message="ciderui-zola: cui_post needs an href") }}{% endif -%}
 {%- if not headline %}{{ throw(message="ciderui-zola: cui_post needs a headline") }}{% endif -%}
@@ -273,8 +272,7 @@
 
 {#- cui_localnav: the bar under the global nav, a section's title and its
     pages ([{ text, href }]; none, no menu), the current page's href marked,
-    a button after them ({ text, href }, {} for none), dark (the crate's
-    LocalNav). -#}
+    a button after them ({ text, href }, {} for none), dark (site.LocalNav). -#}
 {% component cui_localnav(title, href, links=[], current="", button={}, dark=false, class="") -%}
 {%- if not title %}{{ throw(message="ciderui-zola: cui_localnav needs a title") }}{% endif -%}
 {%- if not href %}{{ throw(message="ciderui-zola: cui_localnav needs an href") }}{% endif -%}
@@ -305,7 +303,7 @@
 
 {#- cui_docs_bar: Apple's developer documentation's bar, the button that
     opens the navigator (navigator: its id, "" for no button) before the
-    documentation's title, a link home (the crate's DocsBar). -#}
+    documentation's title, a link home (docs.DocsBar). -#}
 {% component cui_docs_bar(title, href, navigator="", class="") -%}
 {%- if not title %}{{ throw(message="ciderui-zola: cui_docs_bar needs a title") }}{% endif -%}
 <nav class="cui-docs-bar{% if class %} {{ class }}{% endif %}" aria-label="{{ title }}">
@@ -317,8 +315,7 @@
 {%- endcomponent cui_docs_bar %}
 
 {#- cui_docs_copy: a code listing (body: the page's <pre>) with DocC's
-    copy button, hidden until the theme's script shows it and copies (the
-    crate's DocsCopy). -#}
+    copy button, hidden until the theme's script shows it and copies (docs.DocsCopy). -#}
 {% component cui_docs_copy(class="") -%}
 <div class="cui-docs-copy{% if class %} {{ class }}{% endif %}">
 {{ body | safe }}
@@ -334,8 +331,7 @@
 
 {#- cui_docs_hero: the top of a documentation page, its crumbs ([{ label,
     href }], the pages above it, [] for none) ending with its title, its
-    eyebrow, its title and its abstract ("" for none) (the crate's
-    DocsHero). -#}
+    eyebrow, its title and its abstract ("" for none) (docs.DocsHero). -#}
 {% component cui_docs_hero(title, crumbs=[], eyebrow="", abstract="", class="") -%}
 {%- if not title %}{{ throw(message="ciderui-zola: cui_docs_hero needs a title") }}{% endif -%}
 <header class="cui-docs-hero{% if class %} {{ class }}{% endif %}">
@@ -363,9 +359,9 @@
     its rows (items: [{ group } or { label, href, current, open, children
     }], children the same, two levels at most); a page with pages under it
     opens and closes by its chevron, its checkbox named after its path's
-    words, as the crate names it; under the rows the filter, hidden, which
-    the theme's script shows and filters with (the crate's
-    DocsNavigator). -#}
+    words, as docs.DocsNavigator names it; under the rows the filter,
+    hidden, which the theme's script shows and filters with
+    (docs.DocsNavigator). -#}
 {% component cui_docs_navigator(title, href, items, class="") -%}
 {%- if not title %}{{ throw(message="ciderui-zola: cui_docs_navigator needs a title") }}{% endif -%}
 <nav class="cui-docs-navigator{% if class %} {{ class }}{% endif %}" aria-label="Navigator">
@@ -408,7 +404,7 @@
 
 {#- cui_docs_topics: Topics or See Also, its title over its groups ([{
     heading, topics: [{ label, href, abstract, collection }] }], a heading
-    "" for none) (the crate's DocsTopics). -#}
+    "" for none) (docs.DocsTopics). -#}
 {% component cui_docs_topics(title, groups, class="") -%}
 {%- if not title %}{{ throw(message="ciderui-zola: cui_docs_topics needs a title") }}{% endif -%}
 <section class="cui-docs-topics{% if class %} {{ class }}{% endif %}">
@@ -430,7 +426,7 @@
 {#- cui_docs_page: a documentation page: its bar, its navigator (its rows,
     cui_docs_navigator's items) in its sheet, and its <main> (body: its
     columns, each a cui-docs-page-column holding a hero, the content or
-    the topics) (the crate's DocsPage). -#}
+    the topics) (docs.DocsPage). -#}
 {% component cui_docs_page(title, href, navigator, class="") -%}
 <div class="cui-docs-page{% if class %} {{ class }}{% endif %}">
 {{ <cui_docs_bar title={title} href={href} navigator="docs-navigator" /> }}

@@ -3,9 +3,9 @@
 // and the Tera that writes it through the theme's components, given the
 // example's own text; test/site is built with them on one page, each in a
 // <div data-example>, and each one's HTML must equal the example's, both
-// normalized as ciderui's crate tests normalize an example (each line
-// trimmed, the lines joined) and then as a browser serializes it (so an
-// apostrophe Tera escapes and hypertext does not reads the same).
+// normalized as ciderui's Go tests read an example (each line trimmed, the
+// lines joined) and then as a browser serializes it (so an apostrophe Tera
+// escapes and the example writes bare reads the same).
 
 import { readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
