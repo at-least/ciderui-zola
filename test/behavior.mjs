@@ -18,7 +18,8 @@
 // so; one, or the field cleared, the quick links again, where they were
 // while they stay; none found, no sections; the index fetched once. Fails at
 // the first step that does not end as it says. And a nav link's flyout,
-// from the site's nav: shown by the pointer, opened over the menu.
+// from the site's nav: shown by the pointer, opened over the menu. And a
+// docs page's copy button: shown, copying, marked copied for a second.
 
 import { existsSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { extname, join } from 'node:path';
@@ -42,7 +43,7 @@ const { root, out } = zolaBuild('site', {
 
 const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.woff2': 'font/woff2', '.png': 'image/png', '.json': 'application/json' };
 const browser = await chromium.launch({ args: ['--font-render-hinting=none'] });
-const page = await browser.newPage({ viewport: { width: 390, height: 900 }, reducedMotion: 'reduce' });
+const page = await browser.newPage({ viewport: { width: 390, height: 900 }, reducedMotion: 'reduce', permissions: ['clipboard-read', 'clipboard-write'] });
 await page.route('https://check.test/**', (route) => {
   let f = join(out, decodeURIComponent(new URL(route.request().url()).pathname));
   if (existsSync(f) && statSync(f).isDirectory()) f = join(f, 'index.html');
@@ -247,6 +248,25 @@ await page.click('.cui-globalnav-flyoutbutton');
 await page.waitForTimeout(100);
 r = await flyout();
 check('below 834px, the menu\'s row opens it over the menu', r.open && r.menu, r);
+
+// a docs page's code block (the test site's Button): its copy button shown
+// by the script, a click copying the listing's code, marked copied for a
+// second
+await page.goto('https://check.test/reference/button/', { waitUntil: 'load' });
+const copy = () => page.evaluate(() => {
+  const b = document.querySelector('.cui-docs-copy-button');
+  return { hidden: b.hidden, beside: b.previousElementSibling?.matches('pre.giallo') ?? false, state: b.dataset.state ?? null, code: b.previousElementSibling.textContent };
+});
+r = await copy();
+check('a docs page\'s code block has its copy button after it, shown by the script', !r.hidden && r.beside && r.state === null, r);
+await page.evaluate(() => document.querySelector('.cui-docs-copy-button').click());
+await page.waitForTimeout(200);
+const copied = { ...(await copy()), clipboard: await page.evaluate(() => navigator.clipboard.readText()) };
+check('its click copies the listing\'s code and marks it copied', copied.state === 'copied' && copied.clipboard === copied.code && copied.code.includes('@import'), copied);
+await page.waitForTimeout(1100);
+r = await copy();
+check('a second on, it is not marked copied', r.state === null, r);
+check('no error on the docs page', errors.length === 0, errors);
 await browser.close();
 rmSync(root, { recursive: true, force: true });
 console.log(`behavior: ${failures} failures`);

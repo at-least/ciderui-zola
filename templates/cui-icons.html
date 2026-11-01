@@ -7,7 +7,7 @@
     footer_chevron, alert, dropdown, close, close_small, orders,
     orders_compact, saves, saves_compact, account, account_compact,
     sign_in, sign_in_compact, docs_sidebar, docs_chevron, docs_article,
-    docs_collection, docs_close.
+    docs_collection, docs_close, docs_copy, docs_copied.
     Written by scripts/build.mjs from ciderui's rust/src/icon.rs: not edited
     by hand. -#}
 {% component cui_icon(name, class="") -%}
@@ -91,6 +91,10 @@
 <svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="17" height="17" viewBox="0 0 14 14"><circle cx="0.875" cy="2.81" r="0.86" fill="currentColor"/><circle cx="0.875" cy="7.01" r="0.86" fill="currentColor"/><circle cx="0.875" cy="11.21" r="0.86" fill="currentColor"/><path d="M3.94 2.81H13.44M3.94 7.01H13.44M3.94 11.21H13.44" fill="none" stroke="currentColor" stroke-width="1.125" stroke-linecap="round"/></svg>
 {%- elif name == "docs_close" -%}
 <svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="19" height="19" viewBox="0 0 14 14"><path d="M1.79 1.79 11.235 11.235M11.235 1.79 1.79 11.235" fill="none" stroke="currentColor" stroke-width="1.58" stroke-linecap="round"/></svg>
+{%- elif name == "docs_copy" -%}
+<svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="25.5" height="25.5" viewBox="0 0 24 24"><path d="M16 2H4A1 1 0 0 0 3 3V17" fill="none" stroke="currentColor" stroke-width="2"/><rect x="7" y="6" width="13" height="16" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+{%- elif name == "docs_copied" -%}
+<svg{% if class %} class="{{ class }}"{% endif %} aria-hidden="true" width="25.5" height="25.5" viewBox="0 0 24 24"><path d="M4.1 12.7 9 17.6 20.3 6.3" fill="none" stroke="currentColor" stroke-width="1.98"/></svg>
 {%- else -%}
 {{ throw(message="ciderui-zola: no icon " ~ name) }}
 {%- endif -%}

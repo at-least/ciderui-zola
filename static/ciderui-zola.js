@@ -6,8 +6,8 @@
 // (cui-gallery-dot, a link to an item) scroll the row to their item, and the
 // dot of the item the row shows is aria-current. Without it the rows still
 // scroll and snap, and a dot is a link. And the search page's results
-// (search.html), which need a script to be found, and the global nav's
-// search's suggestions.
+// (search.html), which need a script to be found, the global nav's
+// search's suggestions, and a docs page's listings' copy buttons.
 
 (() => {
   const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
@@ -223,4 +223,24 @@
   input.addEventListener('input', update);
   // a reset empties the field after its event, which no input follows
   form.addEventListener('reset', () => show(quick, quickSaid));
+})();
+
+// a docs page's code listings (ciderui's cui-docs-copy, around each code
+// block of a docs page): each one's copy button shown, which its CSS leaves
+// hidden with no script, and a click copies its listing's code, the button
+// marked copied for a second, as DocC's (ciderui's reference/apple.com,
+// docc-copy). A copy refused (no clipboard) rejects, uncaught.
+(() => {
+  for (const button of document.querySelectorAll('.cui-docs-copy-button')) {
+    const listing = button.parentElement.querySelector(':scope > pre');
+    if (!listing) throw new Error('ciderui-zola: a copy button with no listing beside it');
+    button.hidden = false;
+    let timer;
+    button.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(listing.textContent);
+      button.dataset.state = 'copied';
+      clearTimeout(timer);
+      timer = setTimeout(() => { delete button.dataset.state; }, 1000);
+    });
+  }
 })();

@@ -9,6 +9,9 @@
       dark, which would follow the reader's OS where ciderui's blocks set
       theirs) and its own color and ground (cui-article's), its tokens
       keeping their light-dark() colors;
+    - on a docs page a code block is in a cui-docs-copy box with its copy
+      button (cz_docs_copy_button), which the theme's script shows and
+      copies with;
     - on a docs page an alert (github_alerts: > [!NOTE], [!IMPORTANT],
       [!TIP], [!WARNING]) is DocC's aside, cui-docs-aside of its kind with
       its word as its label; [!CAUTION], which DocC has none of, and an
@@ -28,7 +31,9 @@
   | replace(from=`<section class="footnotes">`, to=`<section class="cui-article-footnotes">`)
   | regex_replace(pattern=`<pre class="giallo" style="[^"]*" *>`, rep=`<pre class="giallo">`) -%}
 {%- if docs -%}
+{%- set button %}{{ <cz_docs_copy_button /> }}{% endset -%}
 {%- set html = html
+  | regex_replace(pattern=`(?s)(<pre class="giallo">.*?</pre>)`, rep=`<div class="cui-docs-copy">${1}` ~ button ~ `</div>`)
   | regex_replace(pattern=`(?s)<blockquote class="markdown-alert-note">(.*?)</blockquote>`, rep=`<aside class="cui-docs-aside" aria-label="Note"><p class="cui-docs-aside-label">Note</p>${1}</aside>`)
   | regex_replace(pattern=`(?s)<blockquote class="markdown-alert-important">(.*?)</blockquote>`, rep=`<aside class="cui-docs-aside" data-variant="important" aria-label="Important"><p class="cui-docs-aside-label">Important</p>${1}</aside>`)
   | regex_replace(pattern=`(?s)<blockquote class="markdown-alert-tip">(.*?)</blockquote>`, rep=`<aside class="cui-docs-aside" data-variant="tip" aria-label="Tip"><p class="cui-docs-aside-label">Tip</p>${1}</aside>`)

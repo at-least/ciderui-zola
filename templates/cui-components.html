@@ -316,6 +316,22 @@
 </nav>
 {%- endcomponent cui_docs_bar %}
 
+{#- cui_docs_copy: a code listing (body: the page's <pre>) with DocC's
+    copy button, hidden until the theme's script shows it and copies (the
+    crate's DocsCopy). -#}
+{% component cui_docs_copy(class="") -%}
+<div class="cui-docs-copy{% if class %} {{ class }}{% endif %}">
+{{ body | safe }}
+{{ <cz_docs_copy_button /> }}
+</div>
+{%- endcomponent cui_docs_copy %}
+
+{#- cz_docs_copy_button: cui_docs_copy's button, which cui_markdown puts
+    after a docs page's code blocks too. -#}
+{% component cz_docs_copy_button() -%}
+<button class="cui-docs-copy-button" type="button" aria-label="Copy" hidden>{{ <cui_icon name="docs_copy" class="cui-docs-copy-idle" /> }}{{ <cui_icon name="docs_copied" class="cui-docs-copy-done" /> }}</button>
+{%- endcomponent cz_docs_copy_button %}
+
 {#- cui_docs_hero: the top of a documentation page, its crumbs ([{ label,
     href }], the pages above it, [] for none) ending with its title, its
     eyebrow, its title and its abstract ("" for none) (the crate's
