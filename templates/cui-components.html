@@ -363,7 +363,9 @@
     its rows (items: [{ group } or { label, href, current, open, children
     }], children the same, two levels at most); a page with pages under it
     opens and closes by its chevron, its checkbox named after its path's
-    words, as the crate names it (the crate's DocsNavigator). -#}
+    words, as the crate names it; under the rows the filter, hidden, which
+    the theme's script shows and filters with (the crate's
+    DocsNavigator). -#}
 {% component cui_docs_navigator(title, href, items, class="") -%}
 {%- if not title %}{{ throw(message="ciderui-zola: cui_docs_navigator needs a title") }}{% endif -%}
 <nav class="cui-docs-navigator{% if class %} {{ class }}{% endif %}" aria-label="Navigator">
@@ -371,6 +373,11 @@
 <ul class="cui-docs-navigator-list">
 {%- for item in items %}{{ <cz_docs_row item={item} level={1} /> }}{%- endfor %}
 </ul>
+<p class="cui-docs-navigator-empty" hidden>No results found.</p>
+<div class="cui-docs-navigator-filter" role="search" hidden>
+<label class="cui-docs-navigator-field">{{ <cui_icon name="docs_filter" class="cui-docs-navigator-filter-icon" /> }}<input class="cui-docs-navigator-input" type="search" placeholder="Filter" aria-label="Filter" autocomplete="off" spellcheck="false"></label>
+</div>
+<p class="cui-docs-navigator-status" aria-live="polite"></p>
 </nav>
 {%- endcomponent cui_docs_navigator %}
 

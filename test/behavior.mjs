@@ -19,7 +19,8 @@
 // while they stay; none found, no sections; the index fetched once. Fails at
 // the first step that does not end as it says. And a nav link's flyout,
 // from the site's nav: shown by the pointer, opened over the menu. And a
-// docs page's copy button: shown, copying, marked copied for a second.
+// docs page's copy button: shown, copying, marked copied for a second. And
+// its navigator: its column's height under its top, its filter.
 
 import { existsSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { extname, join } from 'node:path';
@@ -39,6 +40,8 @@ const { root, out } = zolaBuild('site', {
   'content/quince.md': '+++\ntitle = "Quince"\n+++\nIts copy.\n',
   'content/plum.md': '+++\ntitle = "Plum"\n+++\nIts copy.\n',
   'content/a-plum-cake.md': '+++\ntitle = "A Plum Cake"\n+++\nIts copy.\n',
+  // a docs page taller than the window, its navigator's column sticking
+  'content/reference/tall.md': `+++\ntitle = "Tall"\ndescription = "A page taller than the window."\n\n[extra]\ncategory = "Pages"\n+++\n\n${Array.from({ length: 40 }, (_, i) => `Paragraph ${i + 1} of a tall page.`).join('\n\n')}\n`,
 });
 
 const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.woff2': 'font/woff2', '.png': 'image/png', '.json': 'application/json' };
@@ -266,6 +269,42 @@ check('its click copies the listing\'s code and marks it copied', copied.state =
 await page.waitForTimeout(1100);
 r = await copy();
 check('a second on, it is not marked copied', r.state === null, r);
+
+// its navigator, at 1200px where it is a column: the column the window's
+// height under its top, the global nav over the bar and then scrolled away;
+// its filter shown, hiding the rows whose names do not hold what is typed
+await page.setViewportSize({ width: 1200, height: 900 });
+await page.goto('https://check.test/reference/tall/', { waitUntil: 'load' });
+await page.waitForTimeout(300);
+const column = () => page.evaluate(() => {
+  const s = document.querySelector('.cui-docs-page-sidebar');
+  const f = document.querySelector('.cui-docs-navigator-filter').getBoundingClientRect();
+  return { top: s.style.getPropertyValue('--cui-docs-page-top'), bottom: Math.round(s.getBoundingClientRect().bottom), filter: Math.round(f.bottom), window: innerHeight, scroll: scrollY };
+});
+r = await column();
+check('a docs page\'s navigator column is the window\'s height under its top, the global nav over the bar, its filter at the window\'s foot', r.top === '96px' && r.bottom === r.window && r.filter === r.window, r);
+await page.evaluate(() => scrollTo(0, 200));
+await page.waitForTimeout(300);
+r = await column();
+check('the global nav scrolled away, the column under the bar the window\'s height, its filter at the window\'s foot', r.scroll === 200 && r.top === '52px' && r.bottom === r.window && r.filter === r.window, r);
+const rows = () => page.evaluate(() => ({
+  filter: !document.querySelector('.cui-docs-navigator-filter').hidden,
+  rows: [...document.querySelectorAll('.cui-docs-navigator-item, .cui-docs-navigator-group')].filter((e) => !e.closest('[hidden]')).map((e) => e.matches('.cui-docs-navigator-group') ? `[${e.textContent}]` : e.querySelector('.cui-docs-navigator-link').innerHTML),
+  open: document.getElementById('docs-navigator-reference').checked,
+  empty: !document.querySelector('.cui-docs-navigator-empty').hidden,
+  status: document.querySelector('.cui-docs-navigator-status').textContent,
+}));
+r = await rows();
+check('its filter shown by the script, every row shown', r.filter && JSON.stringify(r.rows) === JSON.stringify(['Start', 'Reference', '[Controls]', 'Button', 'Field', '[Pages]', 'Section', 'Tall']) && r.status === '', r);
+await page.fill('.cui-docs-navigator-input', 'fie');
+r = await rows();
+check('"fie" typed: the row whose name holds it, marked, its page above and its group\'s title kept, the rest hidden, what it found said', JSON.stringify(r.rows) === JSON.stringify(['Reference', '[Controls]', '<mark class="cui-docs-navigator-match">Fie</mark>ld']) && r.open && !r.empty && r.status === '1 item was found.', r);
+await page.fill('.cui-docs-navigator-input', 'fiezz');
+r = await rows();
+check('what no name holds: no row, its empty line shown, said so', r.rows.length === 0 && r.empty && r.status === 'No results found.', r);
+await page.fill('.cui-docs-navigator-input', '');
+r = await rows();
+check('emptied, every row as it was, unmarked', JSON.stringify(r.rows) === JSON.stringify(['Start', 'Reference', '[Controls]', 'Button', 'Field', '[Pages]', 'Section', 'Tall']) && r.open && !r.empty && r.status === '', r);
 check('no error on the docs page', errors.length === 0, errors);
 await browser.close();
 rmSync(root, { recursive: true, force: true });

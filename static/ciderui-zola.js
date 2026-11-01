@@ -244,3 +244,84 @@
     });
   }
 })();
+
+// a docs page's navigator (ciderui's cui-docs-navigator in its
+// cui-docs-page-sidebar). Its column, from 1024px, the window's height
+// under its top (--cui-docs-page-top), which moves as the global nav over
+// the bar scrolls away, so its filter at its foot stays at the window's
+// foot, as DocC's script keeps it. Its filter shown, and what is typed in
+// it hides the rows whose names do not hold it (as DocC's: a page above a
+// match kept and opened, a group's title kept while a row of it is), marks
+// the part of a name that matches, says what it found (its status, read
+// aloud) and, where nothing matches, shows its empty line; emptied, every
+// row as it was.
+(() => {
+  const sidebar = document.querySelector('.cui-docs-page-sidebar');
+  if (sidebar) {
+    const place = () => {
+      if (getComputedStyle(sidebar).position !== 'sticky') return;
+      sidebar.style.setProperty('--cui-docs-page-top', `${Math.max(0, sidebar.getBoundingClientRect().top)}px`);
+    };
+    let queued = false;
+    const queue = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => { queued = false; place(); });
+    };
+    addEventListener('scroll', queue, { passive: true });
+    addEventListener('resize', queue);
+    place();
+  }
+
+  const navigator = document.querySelector('.cui-docs-navigator');
+  if (!navigator) return;
+  const filter = navigator.querySelector('.cui-docs-navigator-filter');
+  const input = filter.querySelector('.cui-docs-navigator-input');
+  const empty = navigator.querySelector('.cui-docs-navigator-empty');
+  const status = navigator.querySelector('.cui-docs-navigator-status');
+  const items = [...navigator.querySelectorAll('.cui-docs-navigator-item')].map((li) => {
+    const link = li.querySelector(':scope > .cui-docs-navigator-row > .cui-docs-navigator-link');
+    const toggle = li.querySelector(':scope > .cui-docs-navigator-toggle');
+    return { li, link, name: link.textContent, toggle, open: toggle?.checked ?? false };
+  });
+  const groups = [...navigator.querySelectorAll('.cui-docs-navigator-group')];
+  filter.hidden = false;
+
+  const name = (item, at, length) => {
+    item.link.textContent = '';
+    if (at < 0) return item.link.append(item.name);
+    const mark = document.createElement('mark');
+    mark.className = 'cui-docs-navigator-match';
+    mark.textContent = item.name.slice(at, at + length);
+    item.link.append(item.name.slice(0, at), mark, item.name.slice(at + length));
+  };
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    let found = 0;
+    for (const item of items) {
+      const at = q ? item.name.toLowerCase().indexOf(q) : -1;
+      item.match = at >= 0;
+      if (item.match) found++;
+      name(item, at, q.length);
+    }
+    for (const item of items) {
+      // shown: no query, a match, or a page with a match under it
+      const under = item.li.querySelector(':scope > .cui-docs-navigator-list');
+      const inside = Boolean(q && under && items.some((i) => i.match && under.contains(i.li)));
+      item.li.hidden = Boolean(q) && !item.match && !inside;
+      if (item.toggle) item.toggle.checked = q ? inside || item.open : item.open;
+    }
+    for (const group of groups) {
+      // a group's title kept while a row after it, before the next group, is
+      let next = group.nextElementSibling;
+      let kept = false;
+      while (next && !next.matches('.cui-docs-navigator-group')) {
+        if (!next.hidden) kept = true;
+        next = next.nextElementSibling;
+      }
+      group.hidden = Boolean(q) && !kept;
+    }
+    empty.hidden = !q || found > 0;
+    status.textContent = !q ? '' : found ? `${found} ${found === 1 ? 'item was' : 'items were'} found.` : 'No results found.';
+  });
+})();
