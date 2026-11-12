@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{#- Zola's 404: a headline and a more link home, in a section; its texts
-    the site's [extra] not_found = { headline, link }, if it sets them. -#}
-{% block title %}{{ config.extra.not_found.headline | default(value="Page not found") }} - {{ config.title }}{% endblock title %}
+{#- Zola's 404: its headline and a link home, from [extra] words. -#}
+{% block title %}{{ config.extra.words.not_found }} - {{ config.title }}{% endblock title %}
 {% block content -%}
-{%- set nf = config.extra.not_found -%}
-{% <cui_section> %}<h1 class="cui-headline">{{ nf.headline | default(value="The page you’re looking for can’t be found.") }}</h1><p>{{ <cui_more_link href={get_url(path="/")} text={nf.link | default(value="Go to the home page")} /> }}</p>{% </cui_section> %}
+<header class="cz-header">
+<h1 class="cz-title">{{ config.extra.words.not_found }}</h1>
+</header>
+<p><a class="cui-link" href="{{ get_url(path='/') }}">{{ config.extra.words.home }}</a></p>
 {%- endblock content %}

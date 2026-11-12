@@ -1,13 +1,7 @@
 +++
-title = "Story 2, of 2026-10-18"
-description = "Its subhead."
-date = 2026-10-18
-
-[extra]
-category = "Update"
-image = "images/story.png"
+title = "Story 2: a release with one change worth reading about"
+description = "What story 2 changed, and why it matters to the people who use it every day, in two lines at most before the rest is cut."
+date = 2026-10-12
 +++
 
-The copy of story 2, with [a link](/news/) and a note.[^n]
-
-[^n]: Its note.
+The change in story 2, in one paragraph.

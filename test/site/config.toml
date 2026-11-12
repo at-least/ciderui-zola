@@ -1,64 +1,19 @@
-# The checks' site (test/markup.mjs, test/style.mjs): a page for each of
-# ciderui's examples, written through the theme's components. The checks
-# build a copy with the theme linked in as themes/ciderui-zola.
+# The checks' site: every template, the markdown's elements, a paginated
+# section and a section of tiles. The checks build a copy with the theme
+# linked in as themes/ciderui-zola.
 base_url = "https://check.test"
-title = "ciderui-zola checks"
+title = "Cider"
 description = "The pages ciderui-zola's checks build."
 theme = "ciderui-zola"
 compile_sass = false
-build_search_index = true
-
-# the search page's index (search.html)
-[search]
-index_format = "fuse_json"
-include_description = true
 
 [markdown]
 bottom_footnotes = true
-insert_anchor_links = "none"
-github_alerts = true
 
-[markdown.highlighting]
-style = "inline"
-light_theme = "github-light"
-dark_theme = "github-dark"
-
-# the global nav's and the footer's, as ciderui's examples have them
-# (globalnav/globalnav.html, footer/footer.html)
 [extra]
-logo = "static/logo.svg"
 nav = [
-  { text = "Store", href = "/store" },
-  { text = "Laptops", href = "/laptops" },
-  { text = "Tablets", href = "/tablets" },
-  { text = "Support", href = "/support" },
+  { text = "News", href = "/news/" },
+  { text = "Products", href = "/products/" },
+  { text = "Writing", href = "/writing/" },
 ]
-search = "/search"
-bag = "/bag"
-
-[extra.footer]
-notes = '<p>Credit for a trade-in depends on the device. Details at <a href="/shop/trade-in/">example.com/shop/trade-in</a>.</p>'
-directory = [
-  [
-    { id = "footer-shop", title = "Products", links = [{ text = "Store", href = "/store/" }, { text = "Laptops", href = "/laptops/" }, { text = "Phones", href = "/phones/" }] },
-    { id = "footer-wallet", title = "Payments", links = [{ text = "Wallet", href = "/wallet/" }, { text = "Cider Card", href = "/cider-card/" }] },
-  ],
-  [
-    { id = "footer-account", title = "Account", links = [{ text = "Your Account", href = "/account/" }, { text = "Order History", href = "/shop/account/" }] },
-  ],
-]
-shop = 'Want to see it first? <a href="/retail/">Visit a store</a> near you.'
-copyright = "Copyright © 2026 Example Inc. All rights reserved."
-links = [
-  { text = "Privacy Policy", href = "/privacy/" },
-  { text = "Terms of Use", href = "/terms/" },
-  { text = "Site Map", href = "/sitemap/" },
-]
-locale = { text = "United States", href = "/choose-country/" }
-
-# the docs layout's (docs.html, docs-section.html): its bar's and its
-# navigator's title, and its navigator's rows
-[extra.docs]
-title = "Documentation"
-pages = ["start.md", "reference/_index.md"]
-
+copyright = { text = "Copyright © 2026 Example Inc. All rights reserved.", href = "/writing/" }

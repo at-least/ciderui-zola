@@ -1,4 +1,1 @@
-{% extends "base.html" %}
-{#- The home: its markdown, a page composed of ciderui's components. -#}
-{% block description %}{{ section.description or config.description or "" }}{% endblock description %}
-{% block content %}{{ <cui_markdown html={section.content} /> }}{% endblock content %}
+{% extends "section.html" %}

@@ -1,18 +1,43 @@
 {% extends "base.html" %}
-{#- A section: an article of its title, description and markdown, then its
-    pages as rows (cui-posts, headed by its [extra] heading, "Pages"),
-    under its local nav, if it has one. -#}
-{% block title %}{{ section.title }} - {{ config.title }}{% endblock title %}
-{% block description %}{{ section.description or config.description or "" }}{% endblock description %}
+{#- A section: its title, its description and its markdown, then its pages,
+    as rows (cui-list: title, description, date) or, with [extra]
+    tiles = true, as tiles (cui-tiles: a page's [extra] image, its title,
+    its description); with paginate_by, a pager under them. -#}
+{% block title %}{% if section.path == "/" %}{{ config.title }}{% else %}{{ section.title }} - {{ config.title }}{% endif %}{% endblock title %}
+{% block description %}{{ section.description or config.description }}{% endblock description %}
 {% block content -%}
-{{ <cui_section_localnav section={section} current={section.permalink} /> }}
-{% <cui_article headline={section.title} subhead={section.description or ""}> %}{{ <cui_markdown html={section.content} /> }}{% </cui_article> %}
-{%- if section.pages %}
-{% <cui_posts heading={section.extra.heading | default(value="Pages")}> %}
-{%- for p in section.pages -%}
-{%- set media -%}{{ <cui_page_media page={p} class="cui-post-media" width={640} /> }}{%- endset -%}
-<li>{{ <cui_post href={p.permalink} media={media} category={p.extra.category | default(value="")} datetime={p.date or ""} date={p.date | date(format="%B %-d, %Y") if p.date else ""} headline={p.title} /> }}</li>
-{%- endfor -%}
-{% </cui_posts> %}
+{%- set words = config.extra.words -%}
+{%- if section.title %}
+<header class="cz-header">
+<h1 class="cz-title">{{ section.title }}</h1>
+{%- if section.description %}<p class="cz-description">{{ section.description }}</p>{% endif %}
+</header>
+{%- endif %}
+{%- if section.content %}
+<div class="cz-prose">{{ section.content | safe }}</div>
+{%- endif %}
+{%- set pages = paginator.pages if paginator is defined else section.pages %}
+{%- if pages %}
+{%- if section.extra.tiles %}
+{% <cui_tiles class="cz-pages"> %}
+{%- for p in pages %}
+{{ <cui_tile href={p.permalink} title={p.title} image={get_url(path=p.extra.image) if p.extra.image is defined else ""} detail={p.description or ""} /> }}
+{%- endfor %}
+{% </cui_tiles> %}
+{%- else %}
+{% <cui_list class="cz-pages"> %}
+{%- for p in pages %}
+{{ <cui_list_row title={p.title} href={p.permalink} text={p.description or ""} aside={p.date | date(format=words.date) if p.date else ""} /> }}
+{%- endfor %}
+{% </cui_list> %}
+{%- endif %}
+{%- endif %}
+{%- if paginator is defined and paginator.number_pagers > 1 %}
+{%- set i = paginator.current_index %}
+{{ <cui_pager aria_label={words.pagination} page={words.page | replace(from="{n}", to=i ~ "")}
+  first={ {"label": words.first, "href": paginator.first if i > 1 else ""} }
+  previous={ {"label": words.previous, "href": paginator.previous or ""} }
+  next={ {"label": words.next, "href": paginator.next or ""} }
+  last={ {"label": words.last, "href": paginator.last if i < paginator.number_pagers else ""} } /> }}
 {%- endif %}
 {%- endblock content %}

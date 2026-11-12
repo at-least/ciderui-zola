@@ -1,13 +1,13 @@
 {
   "name": "ciderui-zola",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Builds and checks the ciderui Zola theme; a site using the theme needs only zola",
   "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node scripts/build.mjs --check && node test/markup.mjs && node test/style.mjs && node test/skeleton.mjs && node test/behavior.mjs && node test/site.mjs"
+    "test": "node scripts/build.mjs --check && node test/markup.mjs && node test/site.mjs && node test/layout.mjs"
   },
   "devDependencies": {
     "@tailwindcss/cli": "4.3.3",

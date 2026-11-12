@@ -1,65 +1,29 @@
-{#- The page around every template: its head (the theme's stylesheet,
-    Inter's latin face preloaded, the script, a site's own tags), the
-    global nav and the footer from [extra], the page's content between
-    them, in its <main> (block main: a docs page writes its own); dark
-    (cui-dark on <html>) when its front matter's [extra] says so. The markdown the theme reads (cui-markdown.html) needs these
-    [markdown] settings: a site without them fails here. -#}
-{%- if not config.markdown.bottom_footnotes -%}
-{{ throw(message=`ciderui-zola: set bottom_footnotes = true under [markdown]: an article's footnotes are collected at its end, as the Newsroom's are`) }}
-{%- endif -%}
-{%- if config.markdown.insert_anchor_links != "none" -%}
-{{ throw(message=`ciderui-zola: set insert_anchor_links = "none" under [markdown]: apple.com's headings have no anchor link`) }}
-{%- endif -%}
-{%- if not config.markdown.github_alerts -%}
-{{ throw(message=`ciderui-zola: set github_alerts = true under [markdown]: a docs page's alerts (> [!NOTE]) are DocC's asides`) }}
-{%- endif -%}
-{%- if config.markdown.highlighting.style != "inline" -%}
-{{ throw(message=`ciderui-zola: set style = "inline" under [markdown.highlighting]: a code block's tokens keep Giallo's light-dark() colors, which follow a block's scheme`) }}
-{%- endif -%}
+{#- The page around every template: ciderui's stylesheet, then the theme's;
+    the global nav from [extra] nav, the footer from [extra] copyright; the
+    content in <main id="main">, the skip link's target. Dark (cui-dark on
+    <html>) where the page's or section's [extra] dark is true. -#}
 {%- set extra = config.extra -%}
+{%- set words = extra.words -%}
 {%- set dark = (page.extra.dark if page is defined and page.extra.dark is defined else (section.extra.dark if section is defined and section.extra.dark is defined else false)) -%}
 <!doctype html>
 <html lang="{{ lang }}"{% if dark %} class="cui-dark"{% endif %}>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>{% block title %}{{ config.title }}{% endblock title %}</title>
-    <meta name="description" content="{% block description %}{{ config.description or "" }}{% endblock description %}">
-    <link rel="stylesheet" href="{{ get_url(path='ciderui-zola.css', cachebust=true) }}">
-    <link rel="preload" href="{{ get_url(path='fonts/inter-roman-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
-    <script src="{{ get_url(path='ciderui-zola.js', cachebust=true) }}" defer></script>
-    {{ <cui_head tags={extra.head} /> }}
-  </head>
-  <body>
-    {%- if extra.nav %}
-    {%- if not extra.logo %}{{ throw(message="ciderui-zola: a global nav needs its logo: logo = \"static/logo.svg\" under [extra]") }}{% endif %}
-    {%- set nav %}{{ <cz_nav links={extra.nav} /> }}{% endset %}
-    {%- set icons %}{{ <cz_links links={[{"text": "search", "href": extra.search}, {"text": "bag", "href": extra.bag}]} /> }}{% endset %}
-    {%- set icons = load_data(literal=icons, format="json") %}
-    {%- set search_links %}{{ <cz_links links={extra.search_links} /> }}{% endset %}
-    {%- set bag %}{{ <cz_bag line={extra.bag_line} links={extra.bag_links} /> }}{% endset %}
-    {%- set bag = load_data(literal=bag, format="json") %}
-    {{ <cui_globalnav logo={load_data(path=extra.logo, format="plain") | trim} home={get_url(path="/", trailing_slash=true)} name={config.title} links={load_data(literal=nav, format="json")} search={icons[0].href} bag={icons[1].href} search_flyout={extra.search_flyout} search_links={load_data(literal=search_links, format="json")} bag_flyout={extra.bag_flyout} bag_message={extra.bag_message} bag_line={bag.line} bag_heading={extra.bag_heading} bag_links={bag.links} /> }}
-    {%- if extra.search_flyout %}
-    {%- if not config.build_search_index or config.search.index_format != "fuse_json" %}{{ throw(message="ciderui-zola: the nav's search suggests from Zola's search index: build_search_index = true and [search] index_format = \"fuse_json\"") }}{% endif %}
-    {#- its suggestions' sections, which the script fills from the index as
-        something is typed: a suggested link's row and a suggested search's
-        (ciderui's globalnav/suggestions.html) #}
-    <template class="cz-suggestions" data-index="{{ get_url(path='search_index.' ~ lang ~ '.json') }}"><h2 class="cui-globalnav-searchheading" id="cz-suggested-links">Pages</h2><ul class="cui-globalnav-searchlinks" aria-labelledby="cz-suggested-links"><li><a class="cui-globalnav-searchlink" href="">{{ <cui_icon name="arrow" class="cui-globalnav-image" /> }}{{ <cui_icon name="arrow_compact" class="cui-globalnav-image-compact" /> }}<span><mark></mark></span></a></li></ul><h2 class="cui-globalnav-searchheading" id="cz-suggested-searches">Searches</h2><ul class="cui-globalnav-searchlinks" aria-labelledby="cz-suggested-searches"><li><a class="cui-globalnav-searchlink" href="">{{ <cui_icon name="suggestion" class="cui-globalnav-image" /> }}{{ <cui_icon name="suggestion_compact" class="cui-globalnav-image-compact" /> }}<span><mark></mark></span></a></li></ul></template>
-    {%- endif %}
-    {%- endif %}
-    {% block main -%}
-    <main id="main" class="cz-main">
-      {% block content %}{% endblock content %}
-    </main>
-    {%- endblock main %}
-    {%- if extra.footer %}
-    {%- set f = extra.footer %}
-    {%- set links %}{{ <cz_links links={f.links | default(value=[])} /> }}{% endset %}
-    {%- set directory %}[{% for column in f.directory | default(value=[]) %}[{% for section in column %}{"id": {{ section.id | json_encode | safe }}, "title": {{ section.title | json_encode | safe }}, "links": {{ <cz_links links={section.links} /> }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %}]{% endset %}
-    {%- set locale %}{{ <cz_links links={[f.locale] if f.locale is defined else []} /> }}{% endset %}
-    {%- set locale = load_data(literal=locale, format="json") %}
-    {{ <cui_footer copyright={f.copyright} notes={f.notes | default(value="")} directory={load_data(literal=directory, format="json")} shop={f.shop | default(value="")} links={load_data(literal=links, format="json")} locale={ locale[0] if locale else {} } /> }}
-    {%- endif %}
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ config.title }}{% endblock title %}</title>
+<meta name="description" content="{% block description %}{{ config.description }}{% endblock description %}">
+<link rel="stylesheet" href="{{ get_url(path='ciderui.css', cachebust=true) }}">
+<link rel="stylesheet" href="{{ get_url(path='ciderui-zola.css', cachebust=true) }}">
+</head>
+<body>
+{%- if extra.nav %}
+{{ <cui_globalnav wordmark={config.title} home={get_url(path="/", trailing_slash=true)} links={extra.nav} aria_label={words.nav} skip_label={words.skip} menu_aria_label={words.menu} close_aria_label={words.close} /> }}
+{%- endif %}
+<main id="main" tabindex="-1" class="cz-main">
+{% block content %}{% endblock content %}
+</main>
+{%- if extra.copyright.text %}
+{{ <cui_footer copyright={extra.copyright.text} href={extra.copyright.href} /> }}
+{%- endif %}
+</body>
 </html>

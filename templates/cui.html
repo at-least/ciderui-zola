@@ -1,0 +1,88 @@
+{#- ciderui's site parts as Tera components, each writing the markup its Go
+    type in ciderui's go/site writes, its fields as parameters;
+    test/markup.mjs holds each to ciderui's examples. What the Go type
+    panics on throws here. The glyphs are go/internal/glyph's, copied from
+    the examples. -#}
+
+{% component cui_menu_glyph() -%}
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18"><path d="M2 5H16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M2 12H16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+{%- endcomponent cui_menu_glyph %}
+
+{#- cui_globalnav: site.GlobalNav without search or POST links, the skip
+    link before it; links [{ text, href }]. -#}
+{% component cui_globalnav(wordmark, home, links, aria_label, skip_label, menu_aria_label, close_aria_label) -%}
+{%- if not home %}{{ throw(message="ciderui-zola: cui_globalnav needs a home") }}{% endif -%}
+{%- if not wordmark %}{{ throw(message="ciderui-zola: cui_globalnav needs a wordmark") }}{% endif -%}
+{%- if not links %}{{ throw(message="ciderui-zola: cui_globalnav needs links") }}{% endif -%}
+{%- if not (aria_label and skip_label and menu_aria_label and close_aria_label) %}{{ throw(message="ciderui-zola: cui_globalnav needs its words: aria_label, skip_label, menu_aria_label, close_aria_label") }}{% endif -%}
+<a class="cui-btn cui-skip" href="#main">{{ skip_label }}</a>
+<nav class="cui-globalnav" aria-label="{{ aria_label }}">
+<div class="cui-globalnav-content">
+<ul class="cui-globalnav-list" id="cui-globalnav-menu" popover>
+<li><a class="cui-globalnav-wordmark" href="{{ home }}">{{ wordmark }}</a></li>
+<li><button class="cui-globalnav-closebutton" popovertarget="cui-globalnav-menu" popovertargetaction="hide" aria-label="{{ close_aria_label }}" autofocus>{{ <cui_menu_glyph /> }}</button></li>
+{%- for link in links %}
+{%- if not (link.text and link.href) %}{{ throw(message="ciderui-zola: a global nav link needs its text and href") }}{% endif %}
+<li><a class="cui-globalnav-link" href="{{ link.href }}">{{ link.text }}</a></li>
+{%- endfor %}
+</ul>
+<button class="cui-globalnav-menubutton" popovertarget="cui-globalnav-menu" aria-label="{{ menu_aria_label }}">{{ <cui_menu_glyph /> }}</button>
+</div>
+</nav>
+{%- endcomponent cui_globalnav %}
+
+{#- cui_footer: site.Footer, its copyright text, a link when href is
+    given. -#}
+{% component cui_footer(copyright, href="") -%}
+{%- if not copyright %}{{ throw(message="ciderui-zola: cui_footer needs a copyright") }}{% endif -%}
+<footer class="cui-footer">
+<div class="cui-footer-content">
+<div class="cui-footer-legal">
+<p class="cui-footer-copyright">{% if href %}<a href="{{ href }}">{{ copyright }}</a>{% else %}{{ copyright }}{% endif %}</p>
+</div>
+</div>
+</footer>
+{%- endcomponent cui_footer %}
+
+{#- cui_list: site.List, its rows the body, each a cui_list_row
+    (site.ListRow: title, href, text and aside, "" for none). -#}
+{% component cui_list(class="") -%}
+{%- if not body | trim %}{{ throw(message="ciderui-zola: cui_list needs rows") }}{% endif -%}
+<ul class="cui-list{% if class %} {{ class }}{% endif %}">
+{{ body | safe }}
+</ul>
+{%- endcomponent cui_list %}
+
+{% component cui_list_row(title, href, text="", aside="") -%}
+{%- if not (title and href) %}{{ throw(message="ciderui-zola: a list row needs its title and href") }}{% endif -%}
+<li class="cui-list-row"><div><a class="cui-list-title" href="{{ href }}">{{ title }}</a>{% if text %}<p class="cui-list-text">{{ text }}</p>{% endif %}</div>{% if aside %}<div class="cui-list-aside">{{ aside }}</div>{% endif %}</li>
+{%- endcomponent cui_list_row %}
+
+{#- cui_tiles: site.Tiles, its items the body, each a cui_tile (site.Tile:
+    href, title, image and detail; image "" draws the square in the
+    alternate ground). -#}
+{% component cui_tiles(class="") -%}
+{%- if not body | trim %}{{ throw(message="ciderui-zola: cui_tiles needs items") }}{% endif -%}
+<ul class="cui-tiles{% if class %} {{ class }}{% endif %}">
+{{ body | safe }}
+</ul>
+{%- endcomponent cui_tiles %}
+
+{% component cui_tile(href, title, image="", detail="") -%}
+{%- if not (title and href) %}{{ throw(message="ciderui-zola: a tile needs its title and href") }}{% endif -%}
+<li class="cui-tile">{% if image %}<img class="cui-tile-media" src="{{ image }}" alt="" loading="lazy" decoding="async">{% else %}<span class="cui-tile-media"></span>{% endif %}<a class="cui-tile-title" href="{{ href }}">{{ title }}</a>{% if detail %}<p class="cui-tile-detail">{{ detail }}</p>{% endif %}</li>
+{%- endcomponent cui_tile %}
+
+{#- cui_pager: site.Pager; first, previous, next and last each
+    { label, href }, its href "" where there is no such page. -#}
+{% component cui_pager(aria_label, page, first, previous, next, last) -%}
+{%- if not aria_label %}{{ throw(message="ciderui-zola: cui_pager needs an aria_label") }}{% endif -%}
+{%- if not page %}{{ throw(message="ciderui-zola: cui_pager needs a page") }}{% endif -%}
+{%- for l in [first, previous, next, last] %}{% if l.href and not l.label %}{{ throw(message="ciderui-zola: a pager's links need their label") }}{% endif %}{% endfor -%}
+<nav class="cui-pager" aria-label="{{ aria_label }}">
+{%- if first.href %}<a class="cui-pager-button" href="{{ first.href }}">{{ first.label }}</a>{% endif %}
+{%- if previous.href %}<a class="cui-pager-button" href="{{ previous.href }}" aria-label="{{ previous.label }}"><svg aria-hidden="true" width="0.74561em" height="0.9em" viewBox="0 -10 74.561 90"><path d="M49.9 -2.3 11.78 35.2 49.9 72.7" fill="none" stroke="currentColor" stroke-width="11.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>{% endif %}<span class="cui-pager-page" aria-current="page">{{ page }}</span>
+{%- if next.href %}<a class="cui-pager-button" href="{{ next.href }}" aria-label="{{ next.label }}"><svg aria-hidden="true" width="0.74561em" height="0.9em" viewBox="0 -10 74.561 90"><path d="M24.661 -2.3 62.781 35.2 24.661 72.7" fill="none" stroke="currentColor" stroke-width="11.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>{% endif %}
+{%- if last.href %}<a class="cui-pager-button" href="{{ last.href }}">{{ last.label }}</a>{% endif -%}
+</nav>
+{%- endcomponent cui_pager %}

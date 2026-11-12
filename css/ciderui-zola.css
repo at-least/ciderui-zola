@@ -1,18 +1,156 @@
-/* ciderui-zola — the theme's stylesheet, built into static/ciderui-zola.css
- * by `npm run build`: Tailwind's preflight and theme, ciderui (its tokens,
- * base and type), its site set (site.css) and its docs set (docs.css, the
- * docs layout's), and its type utilities,
- * which Tailwind writes only for a class it finds: a site's markdown is not
- * scanned, so all of them are named here. The templates write ciderui's
- * classes and no utility, and are not scanned: a word in their comments
- * would be read as one. Last, zola.css: the page's skeleton, the theme's
- * own. */
+/* The theme's own stylesheet, after ciderui's (static/ciderui.css): the page's
+   column and the markdown's elements, which ciderui leaves to the page.
+   Built into static/ciderui-zola.css by `npm run build`; the type is
+   ciderui's classes by @apply, so a size is never copied here. */
 
-@import "tailwindcss" source(none);
-@source inline("cui-headline-standalone cui-headline-super cui-headline-elevated cui-headline cui-headline-reduced cui-eyebrow-super cui-eyebrow-elevated cui-eyebrow cui-eyebrow-reduced cui-callout cui-label cui-quote cui-quote-reduced cui-manifesto cui-intro-elevated cui-intro cui-tout cui-body cui-body-tight cui-body-reduced cui-body-reduced-tight cui-caption");
+@import "../node_modules/ciderui/type.css";
 
-@import "ciderui/fonts.css";
-@import "ciderui";
-@import "ciderui/site.css";
-@import "ciderui/docs.css";
-@import "./zola.css";
+@layer components {
+  /* the footer's column (cui-footer-content), so the page's edges and the
+     footer's line up */
+  .cz-main {
+    width: 100%;
+    max-width: 980px;
+    margin-inline: auto;
+    padding: 52px 16px 80px;
+
+    @media (width >= 834px) {
+      padding-inline: 22px;
+    }
+  }
+
+  /* a page's title, its description and its date: the store's ladder */
+  .cz-header {
+    margin-bottom: 40px;
+  }
+
+  .cz-title {
+    @apply cui-headline;
+  }
+
+  .cz-description {
+    @apply cui-intro;
+    margin-top: 12px;
+    color: var(--cui-c-text-2);
+  }
+
+  .cz-date {
+    @apply cui-caption;
+    display: block;
+    margin-top: 12px;
+    color: var(--cui-c-text-2);
+  }
+
+  /* the markdown's HTML: Zola writes bare elements, so this styles them by
+     tag; a ciderui part written in the markdown keeps its own look
+     (:where() under it, rule 4 of ciderui) */
+  .cz-prose {
+    max-width: 692px;
+
+    :where(& > * + *) {
+      margin-top: 25px;
+    }
+
+    :where(h2) {
+      @apply cui-eyebrow;
+      margin-top: 52px;
+    }
+
+    :where(h3, h4, h5, h6) {
+      @apply cui-body;
+      font-weight: 600;
+      margin-top: 40px;
+    }
+
+    :where(a:not([class*="cui-"])) {
+      color: var(--cui-c-link);
+
+      @media (hover: hover) {
+        &:hover {
+          text-decoration-line: underline;
+        }
+      }
+    }
+
+    :where(ul, ol) {
+      padding-left: 1.2em;
+    }
+
+    :where(ul) {
+      list-style: disc;
+    }
+
+    :where(ol) {
+      list-style: decimal;
+    }
+
+    :where(li + li) {
+      margin-top: 8px;
+    }
+
+    :where(blockquote) {
+      @apply cui-intro;
+    }
+
+    :where(code) {
+      font-family: var(--cui-font-mono);
+      font-size: 0.88em;
+    }
+
+    :where(pre) {
+      overflow-x: auto;
+      padding: 16px 20px;
+      border-radius: 18px;
+      background-color: var(--cui-c-bg-alt);
+      font-size: 14px;
+      line-height: 20px;
+
+      :where(code) {
+        font-size: inherit;
+      }
+    }
+
+    :where(img, video) {
+      max-width: 100%;
+      height: auto;
+      border-radius: 18px;
+    }
+
+    :where(hr) {
+      border-top: 1px solid var(--cui-c-divider);
+    }
+
+    :where(table) {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      line-height: 18px;
+    }
+
+    :where(th, td) {
+      padding: 12px 12px 12px 0;
+      border-bottom: 1px solid var(--cui-c-divider);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    :where(th) {
+      font-weight: 600;
+    }
+
+    :where(.footnote-definition) {
+      @apply cui-caption;
+      color: var(--cui-c-text-2);
+    }
+  }
+
+  /* what follows the markdown: a section's pages, its pager */
+  .cz-prose + .cz-pages,
+  .cz-header + .cz-pages {
+    margin-top: 52px;
+  }
+
+  .cz-pages + .cui-pager {
+    margin-top: 40px;
+  }
+}

@@ -1,11 +1,14 @@
 {% extends "base.html" %}
-{#- A page: an article (cui-article), its headline the page's title, its
-    subhead its description, its copy the markdown; under its section's
-    local nav, if the section has one. -#}
-{% block title %}{{ page.title }}{% if page.title != config.title %} - {{ config.title }}{% endif %}{% endblock title %}
-{% block description %}{{ page.description or config.description or "" }}{% endblock description %}
+{#- A page: its title, its description, its date, then its markdown. -#}
+{% block title %}{{ page.title }} - {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description or config.description }}{% endblock description %}
 {% block content -%}
-{%- set parent = get_section(path=page.ancestors | last) if page.ancestors else "" -%}
-{{ <cui_section_localnav section={parent} current={page.permalink} /> }}
-{% <cui_article headline={page.title} subhead={page.description or ""}> %}{{ <cui_markdown html={page.content} /> }}{% </cui_article> %}
+<header class="cz-header">
+<h1 class="cz-title">{{ page.title }}</h1>
+{%- if page.description %}<p class="cz-description">{{ page.description }}</p>{% endif %}
+{%- if page.date %}<time class="cz-date" datetime="{{ page.date }}">{{ page.date | date(format=config.extra.words.date) }}</time>{% endif %}
+</header>
+{%- if page.content %}
+<div class="cz-prose">{{ page.content | safe }}</div>
+{%- endif %}
 {%- endblock content %}

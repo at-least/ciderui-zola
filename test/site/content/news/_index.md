@@ -1,10 +1,6 @@
 +++
 title = "News"
-description = "The checks' news section."
-template = "news.html"
-page_template = "news-page.html"
+description = "What changed, newest first."
 sort_by = "date"
-
-[extra]
-localnav = { links = [{ text = "Latest", href = "/news/" }, { text = "Archive", href = "/news/archive/" }] }
+paginate_by = 2
 +++
