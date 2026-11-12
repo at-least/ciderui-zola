@@ -144,10 +144,17 @@
     }
   }
 
-  /* what follows the markdown: a section's pages, its pager */
-  .cz-prose + .cz-pages,
-  .cz-header + .cz-pages {
+  /* what follows the markdown: a section's pages, their heading, its pager */
+  .cz-pages-heading {
+    @apply cui-eyebrow;
+  }
+
+  :is(.cz-prose, .cz-header) + :is(.cz-pages, .cz-pages-heading) {
     margin-top: 52px;
+  }
+
+  .cz-pages-heading + .cz-pages {
+    margin-top: 12px;
   }
 
   .cz-pages + .cui-pager {

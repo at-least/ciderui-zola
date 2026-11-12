@@ -2,7 +2,8 @@
 {#- A section: its title, its description and its markdown, then its pages,
     as rows (cui-list: title, description, date) or, with [extra]
     tiles = true, as tiles (cui-tiles: a page's [extra] image, its title,
-    its description); with paginate_by, a pager under them. -#}
+    its description), under [extra] heading if it is set; with
+    paginate_by, a pager under them. -#}
 {% block title %}{% if section.path == "/" %}{{ config.title }}{% else %}{{ section.title }} - {{ config.title }}{% endif %}{% endblock title %}
 {% block description %}{{ section.description or config.description }}{% endblock description %}
 {% block content -%}
@@ -18,6 +19,9 @@
 {%- endif %}
 {%- set pages = paginator.pages if paginator is defined else section.pages %}
 {%- if pages %}
+{%- if section.extra.heading %}
+<h2 class="cz-pages-heading">{{ section.extra.heading }}</h2>
+{%- endif %}
 {%- if section.extra.tiles %}
 {% <cui_tiles class="cz-pages"> %}
 {%- for p in pages %}

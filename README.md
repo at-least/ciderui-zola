@@ -28,7 +28,7 @@ copyright = { text = "Copyright © 2026 Example Inc.", href = "/about/" }
 | template | for |
 | --- | --- |
 | `index.html` | the home, as a section; leave its `title` empty for no headline |
-| `section.html` | its title, description and markdown, then its pages as rows (title, description, date); with `[extra] tiles = true`, as tiles (a page's `[extra] image`, title, description); with `paginate_by`, a pager under them |
+| `section.html` | its title, description and markdown, then its pages as rows (title, description, date); with `[extra] tiles = true`, as tiles (a page's `[extra] image`, title, description); with `[extra] heading`, a heading over them; with `paginate_by`, a pager under them |
 | `page.html` | its title, description and date, then its markdown |
 | `404.html` | a headline and a link home |
 
