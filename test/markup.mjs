@@ -21,6 +21,7 @@ const NONE = '{"label": "", "href": ""}';
 export const CASES = [
   ['globalnav/globalnav', `{{ <cui_globalnav wordmark="Cider" home="/" links={${NAV}} ${WORDS} /> }}`],
   ['footer/footer', `{{ <cui_footer copyright="Example Inc." href="/company/" /> }}`],
+  ['footer/directory', `{{ <cui_footer copyright="Example Inc." href="/company/" directory_aria_label="Directory" directory={[{"title": "Products", "links": [{"text": "Store", "href": "/store/"}, {"text": "Laptops", "href": "/laptops/"}, {"text": "Phones", "href": "/phones/"}]}, {"title": "Account", "links": [{"text": "Your Account", "href": "/account/"}, {"text": "Order History", "href": "/orders/"}]}]} /> }}`],
   ['list/list', `{% <cui_list> %}${[
     `{{ <cui_list_row title="Software keyboard fails to appear in a playground app" href="#keyboard" text="The on-screen keyboard does not appear when editing a text field in an app made and run in Swift Playgrounds. It happens in a new, empty app too, with no code of its own." aside="3 replies · 8m" /> }}`,
     `{{ <cui_list_row title="Enrollment still pending after ten days" href="#enrollment" text="Payment went through and the ID was sent the same day." aside="12 replies · 2h" /> }}`,

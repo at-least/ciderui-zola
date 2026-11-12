@@ -16,4 +16,8 @@ nav = [
   { text = "Products", href = "/products/" },
   { text = "Writing", href = "/writing/" },
 ]
+directory = [
+  { title = "Products", links = [{ text = "Store", href = "/products/" }, { text = "News", href = "/news/" }] },
+  { title = "Account", links = [{ text = "Writing", href = "/writing/" }] },
+]
 copyright = { text = "Copyright © 2026 Example Inc. All rights reserved.", href = "/writing/" }

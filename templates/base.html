@@ -23,7 +23,7 @@
 {% block content %}{% endblock content %}
 </main>
 {%- if extra.copyright.text %}
-{{ <cui_footer copyright={extra.copyright.text} href={extra.copyright.href} /> }}
+{{ <cui_footer copyright={extra.copyright.text} href={extra.copyright.href} directory={extra.directory} directory_aria_label={words.directory if extra.directory else ""} /> }}
 {%- endif %}
 </body>
 </html>

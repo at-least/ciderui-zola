@@ -20,6 +20,7 @@ copyright = { text = "Copyright © 2026 Example Inc.", href = "/about/" }
 | --- | --- |
 | `nav` | the global nav's links, beside the site's `title`; `[]` for no global nav |
 | `copyright` | the footer's line, a link when `href` is set; `text = ""` for no footer |
+| `directory` | the footer's link columns, `[{ title, links = [{ text, href }] }]`, folded under their titles on a phone; `[]` for none |
 | `words` | what the theme writes (Skip to Content, Menu, Page 2, the date's format, …), in English; a site in another language sets the ones it changes. `theme.toml` lists them all |
 
 ## Its pages

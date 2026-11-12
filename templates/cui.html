@@ -32,11 +32,31 @@
 {%- endcomponent cui_globalnav %}
 
 {#- cui_footer: site.Footer, its copyright text, a link when href is
-    given. -#}
-{% component cui_footer(copyright, href="") -%}
+    given; its directory, sections [{ title, links: [{ text, href }] }]
+    ([] for none), named by directory_aria_label. -#}
+{% component cui_footer(copyright, href="", directory=[], directory_aria_label="") -%}
 {%- if not copyright %}{{ throw(message="ciderui-zola: cui_footer needs a copyright") }}{% endif -%}
+{%- if (directory | length > 0) != (directory_aria_label != "") %}{{ throw(message="ciderui-zola: cui_footer has a directory or a directory_aria_label without the other") }}{% endif -%}
 <footer class="cui-footer">
 <div class="cui-footer-content">
+{%- if directory %}
+<nav class="cui-footer-directory" aria-label="{{ directory_aria_label }}">
+{%- for section in directory %}
+{%- if not (section.title and section.links) %}{{ throw(message="ciderui-zola: a footer section needs its title and links") }}{% endif %}
+{%- set id = "cui-footer-section-" ~ loop.index %}
+<div class="cui-footer-section">
+<input class="cui-footer-toggle" type="checkbox" id="{{ id }}">
+<h3 class="cui-footer-title"><label for="{{ id }}">{{ section.title }}<svg aria-hidden="true" width="11" height="6" viewBox="0 0 11 6"><path d="M10.075.675 5.5 5.323.925.675" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></label></h3>
+<ul class="cui-footer-list">
+{%- for link in section.links %}
+{%- if not (link.text and link.href) %}{{ throw(message="ciderui-zola: a footer link needs its text and href") }}{% endif %}
+<li><a href="{{ link.href }}">{{ link.text }}</a></li>
+{%- endfor %}
+</ul>
+</div>
+{%- endfor %}
+</nav>
+{%- endif %}
 <div class="cui-footer-legal">
 <p class="cui-footer-copyright">{% if href %}<a href="{{ href }}">{{ copyright }}</a>{% else %}{{ copyright }}{% endif %}</p>
 </div>

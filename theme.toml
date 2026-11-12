@@ -14,12 +14,15 @@ homepage = ""
 #   [] for no global nav.
 # - copyright: the footer's line, { text, href } (href "" for no link);
 #   text "" for no footer.
+# - directory: the footer's link columns, [{ title, links = [{ text, href }] }],
+#   folded under their titles on a phone; [] for none.
 # - words: what the theme writes, in English; a site in another language
 #   sets the ones it changes (Zola merges [extra.words] key by key). date is
 #   a Zola date format; page's {n} is the page's number.
 [extra]
 nav = []
 copyright = { text = "", href = "" }
+directory = []
 
 [extra.words]
 skip = "Skip to Content"
@@ -27,6 +30,7 @@ nav = "Global"
 menu = "Menu"
 close = "Close"
 pagination = "Pagination"
+directory = "Directory"
 first = "First"
 previous = "Previous page"
 next = "Next page"
