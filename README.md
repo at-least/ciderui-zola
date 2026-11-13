@@ -2,7 +2,7 @@
 
 This project is agent-native: written and maintained entirely by AI agents, and fully optimized for agent vibe coding, debugging, and recursive self-improvement (RSI). This README is the only file written for people; every other file is written for the agents that read and change it. What is decided, and why, is in [DESIGN.md](DESIGN.md).
 
-A [Zola](https://www.getzola.org) theme in apple.com's look, built on the latest [ciderui](../ciderui): its global nav, its footer, its list, its tiles and its pager, with the markdown set in its type. No JavaScript.
+A [Zola](https://www.getzola.org) theme in apple.com's look, built on the latest [ciderui](../ciderui): its global nav, its footer and its list, with the markdown set in its type. No JavaScript.
 
 ## Use it
 
@@ -21,14 +21,14 @@ copyright = { text = "Copyright © 2026 Example Inc.", href = "/about/" }
 | `nav` | the global nav's links, beside the site's `title`; `[]` for no global nav |
 | `copyright` | the footer's line, a link when `href` is set; `text = ""` for no footer |
 | `directory` | the footer's link columns, `[{ title, links = [{ text, href }] }]`, folded under their titles on a phone; `[]` for none |
-| `words` | what the theme writes (Skip to Content, Menu, Page 2, the date's format, …), in English; a site in another language sets the ones it changes. `theme.toml` lists them all |
+| `words` | what the theme writes (Skip to Content, Menu, the date's format, …), in English; a site in another language sets the ones it changes. `theme.toml` lists them all |
 
 ## Its pages
 
 | template | for |
 | --- | --- |
 | `index.html` | the home, as a section; leave its `title` empty for no headline |
-| `section.html` | its title, description and markdown, then its pages as rows (title, description, date); with `[extra] tiles = true`, as tiles (a page's `[extra] image`, title, description); with `[extra] heading`, a heading over them; with `paginate_by`, a pager under them |
+| `section.html` | its title, description and markdown, then its pages as rows (title, description, date); with `[extra] heading`, a heading over them. No `paginate_by`: ciderui has no pager, so the build stops on it |
 | `page.html` | its title, description and date, then its markdown |
 | `404.html` | a headline and a link home |
 

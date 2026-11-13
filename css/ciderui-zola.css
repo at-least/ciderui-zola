@@ -47,7 +47,7 @@
     max-width: 692px;
   }
 
-  /* what follows the markdown: a section's pages, their heading, its pager */
+  /* what follows the markdown: a section's pages and their heading */
   .cz-pages-heading {
     @apply cui-eyebrow;
   }
@@ -58,9 +58,5 @@
 
   .cz-pages-heading + .cz-pages {
     margin-top: 12px;
-  }
-
-  .cz-pages + .cui-pager {
-    margin-top: 40px;
   }
 }

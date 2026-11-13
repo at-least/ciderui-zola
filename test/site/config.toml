@@ -1,6 +1,5 @@
-# The checks' site: every template, the markdown's elements, a paginated
-# section and a section of tiles. The checks build a copy with the theme
-# linked in as themes/ciderui-zola.
+# The checks' site: every template and the markdown's elements. The checks
+# build a copy with the theme linked in as themes/ciderui-zola.
 base_url = "https://check.test"
 title = "Cider"
 description = "The pages ciderui-zola's checks build."

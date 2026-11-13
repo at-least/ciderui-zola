@@ -11,30 +11,18 @@ import { chromium } from 'playwright-chromium';
 import { example, zolaBuild } from './lib.mjs';
 
 const trimmed = (html) => html.split('\n').map((l) => l.trim()).join('');
-const IMAGES = [...example('tile/tiles').matchAll(/src="([^"]+)"/g)].map((m) => m[1]);
 const NAV = '[{"text": "Store", "href": "/store"}, {"text": "Laptops", "href": "/laptops"}, {"text": "Tablets", "href": "/tablets"}, {"text": "Support", "href": "/support"}]';
-const WORDS = 'aria_label="Global" skip_label="Skip to Content" menu_aria_label="Menu" close_aria_label="Close"';
-const PREVIOUS = '{"label": "Previous page", "href": "?page=2"}';
-const NEXT = '{"label": "Next page", "href": "?page=4"}';
-const NONE = '{"label": "", "href": ""}';
+const WORDS = 'aria_label="Global" skip_label="Skip to Content" open_aria_label="Menu" close_aria_label="Close"';
 
 export const CASES = [
   ['globalnav/globalnav', `{{ <cui_globalnav wordmark="Cider" home="/" links={${NAV}} ${WORDS} /> }}`],
   ['footer/footer', `{{ <cui_footer copyright="Example Inc." href="/company/" /> }}`],
   ['footer/directory', `{{ <cui_footer copyright="Example Inc." href="/company/" directory_aria_label="Directory" directory={[{"title": "Products", "links": [{"text": "Store", "href": "/store/"}, {"text": "Laptops", "href": "/laptops/"}, {"text": "Phones", "href": "/phones/"}]}, {"title": "Account", "links": [{"text": "Your Account", "href": "/account/"}, {"text": "Order History", "href": "/orders/"}]}]} /> }}`],
   ['list/list', `{% <cui_list> %}${[
-    `{{ <cui_list_row title="Software keyboard fails to appear in a playground app" href="#keyboard" text="The on-screen keyboard does not appear when editing a text field in an app made and run in Swift Playgrounds. It happens in a new, empty app too, with no code of its own." aside="3 replies · 8m" /> }}`,
-    `{{ <cui_list_row title="Enrollment still pending after ten days" href="#enrollment" text="Payment went through and the ID was sent the same day." aside="12 replies · 2h" /> }}`,
+    `{{ <cui_list_row title="Software keyboard fails to appear in a playground app" href="#keyboard" detail="The on-screen keyboard does not appear when editing a text field in an app made and run in Swift Playgrounds. It happens in a new, empty app too, with no code of its own." aside="3 replies · 8m" /> }}`,
+    `{{ <cui_list_row title="Enrollment still pending after ten days" href="#enrollment" detail="Payment went through and the ID was sent the same day." aside="12 replies · 2h" /> }}`,
     `{{ <cui_list_row title="Widgets stop refreshing after an update" href="#widgets" /> }}`,
   ].join('\n')}{% </cui_list> %}`],
-  ['tile/tiles', `{% <cui_tiles> %}${[
-    `{{ <cui_tile href="#airpods-pro" image="${IMAGES[0]}" title="AirPods Pro 3" detail="$249.00" /> }}`,
-    `{{ <cui_tile href="#airpods" image="${IMAGES[1]}" title="AirPods 5 with Wireless Charging Case" detail="$179.00" /> }}`,
-    `{{ <cui_tile href="#case" image="${IMAGES[2]}" title="Silicone Case" /> }}`,
-    `{{ <cui_tile href="#band" title="Sport Band" detail="$49.00" /> }}`,
-  ].join('\n')}{% </cui_tiles> %}`],
-  ['pager/pager', `{{ <cui_pager aria_label="Pagination" page="Page 3" first={ {"label": "First", "href": "?page=1"} } previous={ ${PREVIOUS} } next={ ${NEXT} } last={ {"label": "Last", "href": "?page=10"} } /> }}`],
-  ['pager/first', `{{ <cui_pager aria_label="Pagination" page="Page 1" first={ ${NONE} } previous={ ${NONE} } next={ ${NEXT} } last={ {"label": "Last", "href": "?page=10"} } /> }}`],
 ];
 
 const parity = CASES.map(([id, tera]) => `<div data-example="${id}">${tera}</div>`).join('\n');

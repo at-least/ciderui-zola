@@ -17,7 +17,7 @@
 </head>
 <body>
 {%- if extra.nav %}
-{{ <cui_globalnav wordmark={config.title} home={get_url(path="/", trailing_slash=true)} links={extra.nav} aria_label={words.nav} skip_label={words.skip} menu_aria_label={words.menu} close_aria_label={words.close} /> }}
+{{ <cui_globalnav wordmark={config.title} home={get_url(path="/", trailing_slash=true)} links={extra.nav} aria_label={words.nav} skip_label={words.skip} open_aria_label={words.menu} close_aria_label={words.close} /> }}
 {%- endif %}
 <main id="main" tabindex="-1" class="cz-main">
 {% block content %}{% endblock content %}

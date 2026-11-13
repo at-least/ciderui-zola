@@ -18,7 +18,7 @@ homepage = ""
 #   folded under their titles on a phone; [] for none.
 # - words: what the theme writes, in English; a site in another language
 #   sets the ones it changes (Zola merges [extra.words] key by key). date is
-#   a Zola date format; page's {n} is the page's number.
+#   a Zola date format.
 [extra]
 nav = []
 copyright = { text = "", href = "" }
@@ -29,13 +29,7 @@ skip = "Skip to Content"
 nav = "Global"
 menu = "Menu"
 close = "Close"
-pagination = "Pagination"
 directory = "Directory"
-first = "First"
-previous = "Previous page"
-next = "Next page"
-last = "Last"
-page = "Page {n}"
 date = "%B %-d, %Y"
 not_found = "The page you’re looking for can’t be found."
 home = "Go to the home page"
