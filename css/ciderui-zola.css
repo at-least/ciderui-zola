@@ -41,107 +41,10 @@
     color: var(--cui-c-text-2);
   }
 
-  /* the markdown's HTML: Zola writes bare elements, so this styles them by
-     tag; a ciderui part written in the markdown keeps its own look
-     (:where() under it, rule 4 of ciderui) */
+  /* the markdown's column; its elements are ciderui's cui-prose (Apple Support's
+     and DocC's article text, decision 48 of ciderui) */
   .cz-prose {
     max-width: 692px;
-
-    :where(& > * + *) {
-      margin-top: 25px;
-    }
-
-    :where(h2) {
-      @apply cui-eyebrow;
-      margin-top: 52px;
-    }
-
-    :where(h3, h4, h5, h6) {
-      @apply cui-body;
-      font-weight: 600;
-      margin-top: 40px;
-    }
-
-    :where(a:not([class*="cui-"])) {
-      color: var(--cui-c-link);
-
-      @media (hover: hover) {
-        &:hover {
-          text-decoration-line: underline;
-        }
-      }
-    }
-
-    :where(ul, ol) {
-      padding-left: 1.2em;
-    }
-
-    :where(ul) {
-      list-style: disc;
-    }
-
-    :where(ol) {
-      list-style: decimal;
-    }
-
-    :where(li + li) {
-      margin-top: 8px;
-    }
-
-    :where(blockquote) {
-      @apply cui-intro;
-    }
-
-    :where(code) {
-      font-family: var(--cui-font-mono);
-      font-size: 0.88em;
-    }
-
-    :where(pre) {
-      overflow-x: auto;
-      padding: 16px 20px;
-      border-radius: 18px;
-      background-color: var(--cui-c-bg-alt);
-      font-size: 14px;
-      line-height: 20px;
-
-      :where(code) {
-        font-size: inherit;
-      }
-    }
-
-    :where(img, video) {
-      max-width: 100%;
-      height: auto;
-      border-radius: 18px;
-    }
-
-    :where(hr) {
-      border-top: 1px solid var(--cui-c-divider);
-    }
-
-    :where(table) {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-      line-height: 18px;
-    }
-
-    :where(th, td) {
-      padding: 12px 12px 12px 0;
-      border-bottom: 1px solid var(--cui-c-divider);
-      text-align: left;
-      vertical-align: top;
-    }
-
-    :where(th) {
-      font-weight: 600;
-    }
-
-    :where(.footnote-definition) {
-      @apply cui-caption;
-      color: var(--cui-c-text-2);
-    }
   }
 
   /* what follows the markdown: a section's pages, their heading, its pager */

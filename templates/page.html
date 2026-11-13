@@ -9,6 +9,6 @@
 {%- if page.date %}<time class="cz-date" datetime="{{ page.date }}">{{ page.date | date(format=config.extra.words.date) }}</time>{% endif %}
 </header>
 {%- if page.content %}
-<div class="cz-prose">{{ page.content | safe }}</div>
+<div class="cui-prose cz-prose">{{ page.content | safe }}</div>
 {%- endif %}
 {%- endblock content %}

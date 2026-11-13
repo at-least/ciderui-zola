@@ -15,7 +15,7 @@
 </header>
 {%- endif %}
 {%- if section.content %}
-<div class="cz-prose">{{ section.content | safe }}</div>
+<div class="cui-prose cz-prose">{{ section.content | safe }}</div>
 {%- endif %}
 {%- set pages = paginator.pages if paginator is defined else section.pages %}
 {%- if pages %}
